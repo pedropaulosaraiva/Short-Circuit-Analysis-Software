@@ -1,4 +1,6 @@
 import numpy as np
+import elementos_passivos
+import elementos_ativos
 
 
 class Barra:
@@ -32,6 +34,10 @@ class SEP:
         self.id_barra_ref = id_barra_ref
         self.v_base_ref = v_base_ref
 
+        self.matriz_incidencia = [0]*quantidade_barras
+        self.matriz_primitiva_admitancias = []
+        self.matriz_admitancias = []
+
         self._criar_barras()
         self._definir_barra_ref()
 
@@ -43,3 +49,41 @@ class SEP:
     def _definir_barra_ref(self):
         barra_ref: Barra = self.barras[self.id_barra_ref]
         barra_ref.v_base = self.v_base_ref
+
+    def adicionar_elementos(self, elementos: list):
+        self.elementos = elementos
+
+
+        for indx, elemento in enumerate(elementos):
+            coluna_negativa = (elemento.id_barra1 - 1)
+            coluna_positiva = (elemento.id_barra2 - 1)
+
+            A0[indx][coluna_negativa] = -1
+            A0[indx][coluna_positiva] = 1
+
+    def criacao_matriz_incidencia(self, elementos: list):
+        # criação de uma matriz nula elementos x barras
+        A0 = [[0] * self.quantidade_barras] * len(elementos)
+
+        for indx, elemento in enumerate(elementos):
+            if isinstance(elemento, elementos_passivos.LinhaTransmissao | elementos_passivos.Transformador2Enro):
+                coluna_negativa = (elemento.id_barra1 - 1)
+                coluna_positiva = (elemento.id_barra2 - 1)
+
+                A0[indx][coluna_negativa] = -1
+                A0[indx][coluna_positiva] = 1
+            elif isinstance(elemento, elementos_passivos.Transformador3Enro):
+                coluna_negativa_p = (elemento.id_barra1 - 1)
+                coluna_positiva_s = (elemento.id_barra2 - 1)
+                coluna_positiva_t = (elemento.id_barra3 - 1)
+
+                A0[indx][coluna_negativa_p] = -1
+                A0[indx][coluna_positiva_s] = 1
+                A0[indx][coluna_positiva_t] = 1
+            elif isinstance(elemento, elementos_ativos.EquivalenteRede):
+                coluna_positiva = (elemento.id_barra2 - 1)
+
+                A0[indx][coluna_positiva] = -1
+
+    def criacao_matriz_primitiva_admitancias(self):
+        pass

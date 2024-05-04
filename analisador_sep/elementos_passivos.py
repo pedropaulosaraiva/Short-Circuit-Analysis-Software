@@ -7,25 +7,17 @@ class Passivo1Porta:
         self.id_barra1 = id_barra1
         self.id_barra2 = id_barra2
 
-        self.v_base = None
-        self.s_base = None
-        self.v_volts = None
-        self.v_pu = None
-        self.i_amp = None
-        self.i_pu = None
 
-
-class LinhaTransmissao:
+class LinhaTransmissao(Passivo1Porta):
     def __init__(self, z_densidade: complex, comprimento: float, id_barra1: int, id_barra2: int):
         self.z_densidade = z_densidade
         self.comprimento = comprimento
         self.z_linha = z_densidade*comprimento
 
-        self.id_barra1 = id_barra1
-        self.id_barra2 = id_barra2
+        super().__init__(id_barra1, id_barra2)
 
 
-class Transformador2Enro:
+class Transformador2Enro(Passivo1Porta):
     def __init__(self, v_nom_pri: float, v_nom_sec: float, s_nom, r_pu: float, x_pu: float, adiantamento_ps: float,
                  id_barra1: int, id_barra2: int):
         self.v_nom_pri = v_nom_pri
@@ -37,8 +29,7 @@ class Transformador2Enro:
 
         self.adiantamento_ps = adiantamento_ps
 
-        self.id_barra1 = id_barra1
-        self.id_barra2 = id_barra2
+        super().__init__(id_barra1, id_barra2)
 
         self._definicao_z_ohm()
 
@@ -48,15 +39,11 @@ class Transformador2Enro:
         self.z_pri_ohm = self.z_ps_pu * z_nom_pri_base
         self.z_sec_ohm = self.z_ps_pu * z_nom_sec_base
 
-    def mudar_base_z_pu(self, V_base, S_base):
-        pass
-
-
 
 class Transformador3Enro:
     def __init__(self, v_nom_pri: float, v_nom_sec: float, v_nom_ter: float, s_nom_pri: float, s_nom_sec: float,
                  r_ps_pu: float, x_ps_pu: float, r_pt_pu: float, x_pt_pu: float, r_st_pu: float, x_st_pu: float,
-                 adiantamento_ps: float, adiantamento_pt: float, id_barra1: int, id_barra2: int, id_barra3: int = 0):
+                 adiantamento_ps: float, adiantamento_pt: float, id_barra1: int, id_barra2: int, id_barra3 = None):
         self.v_nom_pri = v_nom_pri
         self.v_nom_sec = v_nom_sec
         self.v_nom_ter = v_nom_ter
