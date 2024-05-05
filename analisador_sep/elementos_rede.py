@@ -1,7 +1,5 @@
 import numpy as np
-import elementos_passivos
-import elementos_ativos
-from numero_pu import Zona
+import analisador_sep.elementos_passivos as elementos_passivos
 from analisador_sep.relacoes_sep import RelacoesSEP
 
 
@@ -41,15 +39,19 @@ class Barra:
 
 
 class SEP:
-    def __init__(self, quantidade_barras: int, s_base: float, id_barra_ref: int, v_base_ref: float):
+    def __init__(self, quantidade_barras: int, s_base: float, v_base_barra_1: float):
         self.quantidade_barras = quantidade_barras
-        self.s_base = s_base
-        self.id_barra_ref = id_barra_ref
-        self.v_base_ref = v_base_ref
+        self.s_base = s_base*10**6
+
+        self.v_base_barra_1 = v_base_barra_1*1000
 
         self.matriz_incidencia = [0]*quantidade_barras
         self.matriz_primitiva_admitancias = []
         self.matriz_admitancias = []
+        self.matriz_impedacias = []
+
+        self.elementos = []
+        self.elementos_simplificados = []
 
         self._criar_barras()
         self._definir_barra_ref()
@@ -60,22 +62,29 @@ class SEP:
         self.barras = [barra_terra] + [Barra(id+1) for id in range(self.quantidade_barras)]
 
     def _definir_barra_ref(self):
-        barra_ref: Barra = self.barras[self.id_barra_ref]
-        barra_ref.v_base = self.v_base_ref
+        barra_ref: Barra = self.barras[1]
+        barra_ref.v_base = self.v_base_barra_1
         barra_ref.s_base = self.s_base
 
     def adicionar_elementos(self, elementos: list):
         self.elementos = elementos
         self.elementos_simplificados = RelacoesSEP.simplificar_rede_de_elementos(elementos, self.quantidade_barras)
-    def criacao_matriz_incidencia(self):
-        self.matriz_incidencia = RelacoesSEP.criacao_matriz_incidencia(self.elementos, self.quantidade_barras)
 
-    def definir_base_barras(self, elementos: list, v_base: float, s_base: float, quantidade_barras: int):
+    def criacao_matriz_incidencia(self):
+        self.matriz_incidencia = RelacoesSEP.criacao_matriz_incidencia(self.elementos_simplificados,
+                                                                       self.quantidade_barras)
+
+    def definir_base_barras(self):
+        elementos = self.elementos
+        v_base = self.v_base_barra_1
+        s_base = self.s_base
+        quantidade_barras = self.quantidade_barras
+
         a0 = RelacoesSEP._criar_matriz_incidencia_primitiva(elementos, quantidade_barras)
 
-        for id_barra in range(1, quantidade_barras):
+        for id_barra in range(1, quantidade_barras-1):
             for index, elemento in enumerate(elementos):
-                if (a0[index][id_barra] == -a0[index][id_barra + 1]):
+                if a0[index][id_barra] == -a0[index][id_barra + 1]:
                     if isinstance(elemento, elementos_passivos.Transformador2Enro):
                         elemento: elementos_passivos.Transformador2Enro
                         v_base = v_base*(elemento.v_nom_sec/elemento.v_nom_pri)
@@ -111,4 +120,33 @@ class SEP:
 
 
     def criacao_matriz_primitiva_admitancias(self):
-        pass
+        y_prim = np.zeros((len(self.elementos_simplificados), len(self.elementos_simplificados)), dtype=complex)
+
+        for index, elemento in enumerate(self.elementos_simplificados):
+            elemento: elementos_passivos.Passivo1Porta
+            y_elemento = 1/elemento.z_pu
+            y_prim[index][index] = y_elemento
+
+        self.matriz_primitiva_admitancias = y_prim
+
+    def criacao_matriz_admitancias(self):
+        a_transposta = np.transpose(self.matriz_incidencia)
+        y_prim = self.matriz_primitiva_admitancias
+        a = self.matriz_incidencia
+
+        y = np.matmul(np.matmul(a_transposta, y_prim), a)
+
+        self.matriz_admitancias = y
+
+    def criacao_matriz_impedacias(self):
+        self.matriz_impedacias = np.linalg.inv(self.matriz_admitancias)
+
+    def solve(self):
+        self.criacao_matriz_incidencia()
+        self.definir_base_barras()
+        self.definir_pu_elementos(self.elementos)
+        self.definir_pu_elementos(self.elementos_simplificados)
+        self.criacao_matriz_primitiva_admitancias()
+        self.criacao_matriz_admitancias()
+        self.criacao_matriz_impedacias()
+

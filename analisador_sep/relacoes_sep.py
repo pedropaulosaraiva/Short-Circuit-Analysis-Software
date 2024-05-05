@@ -1,7 +1,7 @@
 import copy
 
-import elementos_passivos
-import elementos_ativos
+import analisador_sep.elementos_passivos as elementos_passivos
+import analisador_sep.elementos_ativos as elementos_ativos
 import numpy as np
 from collections import defaultdict
 
@@ -38,10 +38,6 @@ class RelacoesSEP:
                 else:
                     pass
 
-            elif isinstance(elemento, elementos_ativos.EquivalenteRede):
-                coluna_barra_final = (elemento.id_barra2 - 1)
-
-                a0[indx][coluna_barra_final] = -1
 
         return a0
 
@@ -69,10 +65,6 @@ class RelacoesSEP:
                 else:
                     pass
 
-            elif isinstance(elemento, elementos_ativos.EquivalenteRede):
-                coluna_barra_final = (elemento.id_barra2 - 1)
-
-                a[indx][coluna_barra_final] = -1
 
         return a
 
@@ -135,7 +127,7 @@ if __name__ == '__main__':
                                                        0.0398, 8.3214, 0.0756, 15.5472,
                                                        0.0401, 5.0101, 30, 30,
                                                        4, 5),
-                 elementos_passivos.LinhaTransmissao(4, 1, 5, 6)
+                 elementos_passivos.LinhaTransmissao(4, 1, 5, 6),
                  ]
     quantidade_barras = 6
 
