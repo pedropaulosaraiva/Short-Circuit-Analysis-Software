@@ -1,3 +1,14 @@
+from math import sqrt
+
+
+class Zona:
+    def __init__(self, v_base, s_base):
+        self.v_base = v_base
+        self.s_base = s_base
+        self.z_base = (v_base**2)/s_base
+        self.i_base = (v_base)/(sqrt(3)*self.z_base)
+
+
 class PU:
     def __init__(self, valor_pu: complex, v_base: float = 1, s_base: float = 1):
         self.valor_pu = valor_pu
