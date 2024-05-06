@@ -67,8 +67,13 @@ class SEP:
         barra_ref.s_base = self.s_base
 
     def adicionar_elementos(self, elementos: list):
-        self.elementos = elementos
-        self.elementos_simplificados = RelacoesSEP.simplificar_rede_de_elementos(elementos, self.quantidade_barras)
+        self.elementos = self.organizar_elementos(elementos)
+        self.elementos_simplificados = RelacoesSEP.simplificar_rede_de_elementos(self.elementos, self.quantidade_barras)
+
+    def organizar_elementos(self, elementos: list):
+        "Organiza os elementos da menor barra para maior"
+        elementos = sorted(elementos, key=lambda tup: (tup.id_barra1, tup.id_barra2))
+        return elementos
 
     def criacao_matriz_incidencia(self):
         self.matriz_incidencia = RelacoesSEP.criacao_matriz_incidencia(self.elementos_simplificados,
@@ -108,14 +113,10 @@ class SEP:
                         barra.v_base = self.barras[elemento.id_barra1].v_base
                         barra.s_base = s_base
 
-
-
-
-
     def definir_pu_elementos(self, elementos: list):
 
         for elemento in elementos:
-            elemento: elementos_passivos.Passivo1Porta
+            elemento: elementos_passivos.Elemento2Terminais
             barra_elemento: Barra = self.barras[elemento.id_barra1]
 
             elemento.v_base = barra_elemento.v_base
@@ -127,7 +128,7 @@ class SEP:
         y_prim = np.zeros((len(self.elementos_simplificados), len(self.elementos_simplificados)), dtype=complex)
 
         for index, elemento in enumerate(self.elementos_simplificados):
-            elemento: elementos_passivos.Passivo1Porta
+            elemento: elementos_passivos.Elemento2Terminais
             y_elemento = 1/elemento.z_pu
             y_prim[index][index] = y_elemento
 

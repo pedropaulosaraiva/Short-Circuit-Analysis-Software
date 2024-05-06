@@ -21,7 +21,18 @@ class RelacoesSEP:
         a0 = np.zeros((len(elementos), quantidade_barras))
 
         for indx, elemento in enumerate(elementos):
-            if isinstance(elemento, elementos_passivos.LinhaTransmissao | elementos_passivos.Transformador2Enro):
+            if isinstance(elemento, elementos_passivos.LinhaTransmissao | elementos_passivos.Impedancia):
+                if elemento.id_barra2 == 0:
+                    coluna_barra_inicial = (elemento.id_barra1 - 1)
+
+                    a0[indx][coluna_barra_inicial] = 1
+                else:
+                    coluna_barra_inicial = (elemento.id_barra1 - 1)
+                    coluna_barra_final = (elemento.id_barra2 - 1)
+
+                    a0[indx][coluna_barra_inicial] = 1
+                    a0[indx][coluna_barra_final] = -1
+            elif isinstance(elemento, elementos_passivos.Transformador2Enro):
                 coluna_barra_inicial = (elemento.id_barra1 - 1)
                 coluna_barra_final = (elemento.id_barra2 - 1)
 
@@ -37,17 +48,10 @@ class RelacoesSEP:
                     a0[indx][coluna_barra_final] = -1
                 else:
                     pass
-            elif isinstance(elemento, elementos_passivos.Impedancia):
-                if elemento.id_barra2 == 0:
-                    coluna_barra_inicial = (elemento.id_barra1 - 1)
+            elif isinstance(elemento, elementos_ativos.EquivalenteRede):
+                coluna_barra_inicial = (elemento.id_barra1 - 1)
 
-                    a0[indx][coluna_barra_inicial] = 1
-                else:
-                    coluna_barra_inicial = (elemento.id_barra1 - 1)
-                    coluna_barra_final = (elemento.id_barra2 - 1)
-
-                    a0[indx][coluna_barra_inicial] = 1
-                    a0[indx][coluna_barra_final] = -1
+                a0[indx][coluna_barra_inicial] = 1
 
 
         return a0
@@ -59,7 +63,18 @@ class RelacoesSEP:
 
         # Remove as linhas duplicadas e cria um array
         for indx, elemento in enumerate(elementos_simplificados):
-            if isinstance(elemento, elementos_passivos.LinhaTransmissao | elementos_passivos.Transformador2Enro):
+            if isinstance(elemento, elementos_passivos.LinhaTransmissao | elementos_passivos.Impedancia):
+                if elemento.id_barra2 == 0:
+                    coluna_barra_inicial = (elemento.id_barra1 - 1)
+
+                    a[indx][coluna_barra_inicial] = 1
+                else:
+                    coluna_barra_inicial = (elemento.id_barra1 - 1)
+                    coluna_barra_final = (elemento.id_barra2 - 1)
+
+                    a[indx][coluna_barra_inicial] = 1
+                    a[indx][coluna_barra_final] = -1
+            elif isinstance(elemento, elementos_passivos.Transformador2Enro):
                 coluna_barra_inicial = (elemento.id_barra1 - 1)
                 coluna_barra_final = (elemento.id_barra2 - 1)
 
@@ -75,6 +90,10 @@ class RelacoesSEP:
                     a[indx][coluna_barra_final] = -1
                 else:
                     pass
+            elif isinstance(elemento, elementos_ativos.EquivalenteRede):
+                coluna_barra_inicial = (elemento.id_barra1 - 1)
+
+                a[indx][coluna_barra_inicial] = 1
 
 
         return a

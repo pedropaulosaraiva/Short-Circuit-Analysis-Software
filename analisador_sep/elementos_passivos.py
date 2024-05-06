@@ -1,8 +1,12 @@
 import copy
 
 
-class Passivo1Porta:
+class Elemento2Terminais:
     def __init__(self, z_ohm: complex, nome: str, id_barra1: int, id_barra2: int):
+        if id_barra1 == id_barra2:
+            raise ConnectionError(f"O elemento {nome} está em curto na barra #{id_barra1}")
+        elif id_barra1 > id_barra2:
+            id_barra1, id_barra2 = id_barra2, id_barra1
         self.z_ohm = z_ohm
         self.id_barra1 = id_barra1
         self.id_barra2 = id_barra2
@@ -32,10 +36,21 @@ class Passivo1Porta:
     def calcular_pu(self):
         self.z_pu = self.z_ohm / (self.v_base**2/self.s_base)
 
+class Elemento3Terminais(Elemento2Terminais):
+    def __init__(self, z_ohm: complex, nome: str, id_barra1: int, id_barra2: int, id_barra3=None):
+        if id_barra3 is None:
+            super().__init__(z_ohm, nome, id_barra1, id_barra2)
+        else:
+            pass
 
-class Impedancia(Passivo1Porta):
+
+class Impedancia(Elemento2Terminais):
     def __init__(self, z_ohm: complex, nome: str, id_barra1: int, id_barra2: int):
         super().__init__(z_ohm, nome, id_barra1, id_barra2)
+        # A barra não pode ser terra
+        if self.id_barra1 == 0:
+            self.id_barra1, self.id_barra2 = self.id_barra2, self.id_barra1
+
 
     def __str__(self):
         return (f'A impedância {self.nome} entre as barras #{self.id_barra1} e #{self.id_barra2} com '
@@ -62,7 +77,7 @@ class LinhaTransmissao(Impedancia):
                                     f"({self.nome}//{other.nome})", self.id_barra1, self.id_barra2)
 
 
-class Transformador2Enro(Passivo1Porta):
+class Transformador2Enro(Elemento2Terminais):
     def __init__(self, v_nom_pri: float, v_nom_sec: float, s_nom, r_pu: float, x_pu: float, adiantamento_ps: float,
                  nome: str, id_barra1: int, id_barra2: int):
         self.v_nom_pri = v_nom_pri*1000
@@ -94,7 +109,7 @@ class Transformador2Enro(Passivo1Porta):
             return transformador_resultante
 
 
-class Transformador3Enro(Passivo1Porta):
+class Transformador3Enro(Elemento3Terminais):
     def __init__(self, v_nom_pri: float, v_nom_sec: float, v_nom_ter: float, s_nom_pri: float, s_nom_sec: float,
                  r_ps_pu: float, x_ps_pu: float, r_pt_pu: float, x_pt_pu: float, r_st_pu: float, x_st_pu: float,
                  adiantamento_ps: float, adiantamento_pt: float, nome: str, id_barra1: int, id_barra2: int,
@@ -113,7 +128,7 @@ class Transformador3Enro(Passivo1Porta):
             z_pri = self.z_ps_pu * (v_nom_pri ** 2 / s_nom_pri)
             super().__init__(z_pri, nome, id_barra1, id_barra2)
 
-            self. id_barra3 = id_barra3
+            self.id_barra3 = id_barra3
 
         else:
             pass
