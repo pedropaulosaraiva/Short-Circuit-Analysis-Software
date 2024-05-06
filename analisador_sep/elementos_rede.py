@@ -149,4 +149,3 @@ class SEP:
         self.criacao_matriz_primitiva_admitancias()
         self.criacao_matriz_admitancias()
         self.criacao_matriz_impedacias()
-

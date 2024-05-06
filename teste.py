@@ -12,25 +12,16 @@ sep = SEP(5, 1, 1)
 # Definir elementos do SEP analisado
 
 elementos = [
-    LinhaTransmissao(0.125j, 1, 1, 2),
-    LinhaTransmissao(0.25j, 1, 1, 3),
-    LinhaTransmissao(0.4j, 1, 1, 4),
-    LinhaTransmissao(0.5j, 1, 2, 3),
-    LinhaTransmissao(0.5j, 1, 2, 3),
-    LinhaTransmissao(0.2j, 1, 2, 4),
-    LinhaTransmissao(1.25j, 1, 3, 5),
-    LinhaTransmissao(1.25j, 1, 4, 5),
+    LinhaTransmissao(0.125j, 1,'a', 1, 2),
+    LinhaTransmissao(0.25j, 1,'a', 1, 3),
+    LinhaTransmissao(0.4j, 1,'a', 1, 4),
+    LinhaTransmissao(0.5j, 1,'a', 2, 3),
+    LinhaTransmissao(0.5j, 1,'a', 2, 3),
+    LinhaTransmissao(0.2j, 1,'a', 2, 4),
+    LinhaTransmissao(1.25j, 1,'a', 3, 5),
+    LinhaTransmissao(1.25j, 1,'a', 4, 5),
 ]
 
-elementos2 = [
-    LinhaTransmissao(1.25j, 1, 1, 5),
-    LinhaTransmissao(0.5j, 1, 1, 3),
-    LinhaTransmissao(0.5j, 1, 1, 3),
-    LinhaTransmissao(0.25j, 1, 1, 4),
-    LinhaTransmissao(0.2j, 1, 2, 3),
-
-
-]
 
 #
 sep.adicionar_elementos(elementos)

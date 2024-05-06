@@ -2,11 +2,11 @@ import copy
 
 
 class Passivo1Porta:
-    def __init__(self,z_ohm: complex, id_barra1: int, id_barra2: int):
+    def __init__(self, z_ohm: complex, nome: str, id_barra1: int, id_barra2: int):
         self.z_ohm = z_ohm
         self.id_barra1 = id_barra1
         self.id_barra2 = id_barra2
-
+        self.nome = nome
 
         self._v_base = None
         self._s_base = None
@@ -33,28 +33,38 @@ class Passivo1Porta:
         self.z_pu = self.z_ohm / (self.v_base**2/self.s_base)
 
 
-class LinhaTransmissao(Passivo1Porta):
-    def __init__(self, z_densidade: complex, comprimento: float, id_barra1: int, id_barra2: int):
+class Impedancia(Passivo1Porta):
+    def __init__(self, z_ohm: complex, nome: str, id_barra1: int, id_barra2: int):
+        super().__init__(z_ohm, nome, id_barra1, id_barra2)
+
+    def __str__(self):
+        return (f'A impedância {self.nome} entre as barras #{self.id_barra1} e #{self.id_barra2} com '
+                f'{self.z_ohm} ohms, possui valor em pu: {self.z_pu}@{self.v_base/1000}kV, {self.s_base/10**6}MVA')
+
+
+class LinhaTransmissao(Impedancia):
+    def __init__(self, z_densidade: complex, comprimento: float, nome: str, id_barra1: int, id_barra2: int):
         self.z_densidade = z_densidade
         self.comprimento = comprimento
         self.z_linha = z_densidade*comprimento
 
-        super().__init__(self.z_linha, id_barra1, id_barra2)
+        super().__init__(self.z_linha, nome, id_barra1, id_barra2)
 
     def __str__(self):
-        return f'Linha entre as barras #{self.id_barra1} e #{self.id_barra2}, com impedancia {self.z_linha}'
+        return (f'A linha {self.nome} entre as barras #{self.id_barra1} e #{self.id_barra2} com '
+                f'{self.z_ohm} ohms, possui valor em pu: {self.z_pu}@{self.v_base/1000}kV, {self.s_base/10**6}MVA')
 
     def __truediv__(self, other):
         if not isinstance(other, type(self)):
             raise TypeError(f"O tipo dos elementos em paralelo não é igual: {type(other).__name__}")
         else:
             return LinhaTransmissao((self.z_linha*other.z_linha)/(self.z_linha + other.z_linha), 1,
-                                    self.id_barra1, self.id_barra2)
+                                    f"({self.nome}//{other.nome})", self.id_barra1, self.id_barra2)
 
 
 class Transformador2Enro(Passivo1Porta):
     def __init__(self, v_nom_pri: float, v_nom_sec: float, s_nom, r_pu: float, x_pu: float, adiantamento_ps: float,
-                 id_barra1: int, id_barra2: int):
+                 nome: str, id_barra1: int, id_barra2: int):
         self.v_nom_pri = v_nom_pri*1000
         self.v_nom_sec = v_nom_sec*1000
 
@@ -65,7 +75,11 @@ class Transformador2Enro(Passivo1Porta):
         self.adiantamento_ps = adiantamento_ps
 
         z_pri = self.z_ps_pu*(v_nom_pri**2/s_nom)
-        super().__init__(z_pri, id_barra1, id_barra2)
+        super().__init__(z_pri, nome, id_barra1, id_barra2)
+
+    def __str__(self):
+        return (f'O transformador {self.nome} entre as barras #{self.id_barra1} e #{self.id_barra2},'
+                f'possui valor em pu: {self.z_pu}@{self.v_base/1000}kV, {self.s_base/10**6}MVA')
 
     def __truediv__(self, other):
         if not isinstance(other, type(self)):
@@ -76,15 +90,16 @@ class Transformador2Enro(Passivo1Porta):
             transformador_resultante = copy.deepcopy(self)
             transformador_resultante.z_ps_pu = (self.z_ps_pu * other.z_ps_pu)/(self.z_ps_pu + other.z_ps_pu)
             transformador_resultante.z_ohm = (self.z_ohm * other.z_ohm)/(self.z_ohm + other.z_ohm)
+            transformador_resultante.nome = f"({self.nome}//{other.nome})"
             return transformador_resultante
-
 
 
 class Transformador3Enro(Passivo1Porta):
     def __init__(self, v_nom_pri: float, v_nom_sec: float, v_nom_ter: float, s_nom_pri: float, s_nom_sec: float,
                  r_ps_pu: float, x_ps_pu: float, r_pt_pu: float, x_pt_pu: float, r_st_pu: float, x_st_pu: float,
-                 adiantamento_ps: float, adiantamento_pt: float, id_barra1: int, id_barra2: int, id_barra3 = None):
-        if id_barra3 == None:
+                 adiantamento_ps: float, adiantamento_pt: float, nome: str, id_barra1: int, id_barra2: int,
+                 id_barra3=None):
+        if id_barra3 is None:
             self.v_nom_pri = v_nom_pri*1000
             self.v_nom_sec = v_nom_sec*1000
 
@@ -96,10 +111,17 @@ class Transformador3Enro(Passivo1Porta):
             self.adiantamento_ps = adiantamento_ps
 
             z_pri = self.z_ps_pu * (v_nom_pri ** 2 / s_nom_pri)
-            super().__init__(z_pri, id_barra1, id_barra2)
+            super().__init__(z_pri, nome, id_barra1, id_barra2)
 
             self. id_barra3 = id_barra3
 
+        else:
+            pass
+
+    def __str__(self):
+        if self.id_barra3 is None:
+            return (f'O transformador {self.nome} entre as barras #{self.id_barra1}, #{self.id_barra2} e terciário '
+                    f'em aberto, possui valor em pu: {self.z_pu}@{self.v_base/1000}kV, {self.s_base/10**6}MVA')
         else:
             pass
 
@@ -112,4 +134,5 @@ class Transformador3Enro(Passivo1Porta):
             transformador_resultante = copy.deepcopy(self)
             transformador_resultante.z_ps_pu = (self.z_ps_pu * other.z_ps_pu)/(self.z_ps_pu + other.z_ps_pu)
             transformador_resultante.z_ohm = (self.z_ohm * other.z_ohm)/(self.z_ohm + other.z_ohm)
+            transformador_resultante.nome = f"({self.nome}//{other.nome})"
             return transformador_resultante

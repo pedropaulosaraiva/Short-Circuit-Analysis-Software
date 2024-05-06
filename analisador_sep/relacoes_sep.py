@@ -37,6 +37,17 @@ class RelacoesSEP:
                     a0[indx][coluna_barra_final] = -1
                 else:
                     pass
+            elif isinstance(elemento, elementos_passivos.Impedancia):
+                if elemento.id_barra2 == 0:
+                    coluna_barra_inicial = (elemento.id_barra1 - 1)
+
+                    a0[indx][coluna_barra_inicial] = 1
+                else:
+                    coluna_barra_inicial = (elemento.id_barra1 - 1)
+                    coluna_barra_final = (elemento.id_barra2 - 1)
+
+                    a0[indx][coluna_barra_inicial] = 1
+                    a0[indx][coluna_barra_final] = -1
 
 
         return a0
@@ -112,22 +123,22 @@ class RelacoesSEP:
 
 
 if __name__ == '__main__':
-    elementos = [elementos_passivos.LinhaTransmissao(1+1j, 2, 1, 2),
-                 elementos_passivos.LinhaTransmissao(2+2j,1, 1, 2),
-                 elementos_passivos.LinhaTransmissao(3j, 1, 2, 3),
-                 elementos_passivos.LinhaTransmissao(3j,1, 2, 3),
-                 elementos_passivos.LinhaTransmissao(1j, 3, 2, 3),
-                 elementos_passivos.LinhaTransmissao(5+1j,1, 3, 4),
-                 elementos_passivos.LinhaTransmissao(5 + 5j, 1, 2, 4),
+    elementos = [elementos_passivos.LinhaTransmissao(1+1j, 2,'a', 1, 2),
+                 elementos_passivos.LinhaTransmissao(2+2j,1,'a', 1, 2),
+                 elementos_passivos.LinhaTransmissao(3j, 1,'a', 2, 3),
+                 elementos_passivos.LinhaTransmissao(3j,1,'a', 2, 3),
+                 elementos_passivos.LinhaTransmissao(1j, 3,'a', 2, 3),
+                 elementos_passivos.LinhaTransmissao(5+1j,1,'a', 3, 4),
+                 elementos_passivos.LinhaTransmissao(5 + 5j, 1,'a', 2, 4),
                  elementos_passivos.Transformador3Enro(230, 69,13.8, 100, 40,
                                                        0.0398,8.3214, 0.0756, 15.5472,
                                                        0.0401, 5.0101, 30, 30,
-                                                       4, 5),
+                                                       'a',4, 5),
                  elementos_passivos.Transformador3Enro(230, 69, 13.8, 100, 40,
                                                        0.0398, 8.3214, 0.0756, 15.5472,
                                                        0.0401, 5.0101, 30, 30,
-                                                       4, 5),
-                 elementos_passivos.LinhaTransmissao(4, 1, 5, 6),
+                                                       'a',4, 5),
+                 elementos_passivos.LinhaTransmissao(4, 1, 'a',5, 6),
                  ]
     quantidade_barras = 6
 
