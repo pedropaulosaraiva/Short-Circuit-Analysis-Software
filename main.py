@@ -41,4 +41,3 @@ iresultados = Iresultados(sep)
 iresultados.diagrama_impedancias()
 iresultados.matriz_admitancias()
 iresultados.matriz_impedancias()
-gi
