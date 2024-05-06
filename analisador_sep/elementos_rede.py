@@ -82,31 +82,35 @@ class SEP:
 
         a0 = RelacoesSEP._criar_matriz_incidencia_primitiva(elementos, quantidade_barras)
 
-        for id_barra in range(1, quantidade_barras-1):
+        for id_barra in range(1, quantidade_barras + 1):
             for index, elemento in enumerate(elementos):
-                if a0[index][id_barra] == -a0[index][id_barra + 1]:
+                if elemento.id_barra1 == id_barra:
                     if isinstance(elemento, elementos_passivos.Transformador2Enro):
                         elemento: elementos_passivos.Transformador2Enro
-                        v_base = v_base*(elemento.v_nom_sec/elemento.v_nom_pri)
+                        v_base = self.barras[elemento.id_barra1].v_base * (elemento.v_nom_sec/elemento.v_nom_pri)
 
-                        barra: Barra = self.barras[id_barra + 1]
+                        barra: Barra = self.barras[elemento.id_barra2]
                         barra.v_base = v_base
                         barra.s_base = s_base
 
-                        break
+
                     elif isinstance(elemento, elementos_passivos.Transformador3Enro):
                         elemento: elementos_passivos.Transformador3Enro
-                        v_base = v_base * (elemento.v_nom_sec / elemento.v_nom_pri)
+                        v_base = self.barras[elemento.id_barra1].v_base * (elemento.v_nom_sec / elemento.v_nom_pri)
 
-                        barra: Barra = self.barras[id_barra + 1]
+                        barra: Barra = self.barras[elemento.id_barra2]
                         barra.v_base = v_base
                         barra.s_base = s_base
-                        break
+
                     else:
-                        barra: Barra = self.barras[id_barra + 1]
-                        barra.v_base = v_base
+
+                        barra: Barra = self.barras[elemento.id_barra2]
+                        barra.v_base = self.barras[elemento.id_barra1].v_base
                         barra.s_base = s_base
-                        break
+
+
+
+
 
     def definir_pu_elementos(self, elementos: list):
 

@@ -39,7 +39,6 @@ sep.solve()
 iresultados = Iresultados(sep)
 
 iresultados.diagrama_impedancias()
-iresultados.matriz_admitancias(decimais=4)
-iresultados.matriz_impedancias(decimais=4)
-
-
+iresultados.matriz_admitancias()
+iresultados.matriz_impedancias()
+gi
