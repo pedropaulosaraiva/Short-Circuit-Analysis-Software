@@ -3,11 +3,12 @@ from analisador_sep.elementos_passivos import Elemento2Terminais
 
 class EquivalenteRede(Elemento2Terminais):
     def __init__(self, v_t0_menos: complex, v_base: float,s_base: float, nome: str, id_barra1: int,
-                 Scc3_pu=None, Z0_pu=None):
-        if Scc3_pu is not None:
-            z_pu = (v_t0_menos**2)/Scc3_pu
-        elif Z0_pu is not None:
-            z_pu = Z0_pu
+                 Scc3=None, Z1_pu=None):
+        if Scc3 is not None:
+            Scc3_pu = Scc3/100
+            z_pu = (1)/(Scc3_pu.conjugate())
+        elif Z1_pu is not None:
+            z_pu = Z1_pu
         else:
             raise ValueError(f"Insira um valor de Scc3_pu ou X0_pu")
         z_ohm = z_pu*(v_base**2/s_base)
