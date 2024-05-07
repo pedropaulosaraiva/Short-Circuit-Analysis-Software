@@ -1,12 +1,11 @@
-from math import sqrt
+from math import cos, sin, radians, degrees
+from numpy import angle
 
+def cpolar(modulo, angulo):
+    return modulo * (1 * (cos(radians(angulo)) + 1j * sin(radians(angulo))))
 
-class Zona:
-    def __init__(self, v_base, s_base):
-        self.v_base = v_base
-        self.s_base = s_base
-        self.z_base = (v_base**2)/s_base
-        self.i_base = (v_base)/(sqrt(3)*self.z_base)
+def crec(x: complex):
+    return abs(x), degrees(angle(x))
 
 
 class PU:

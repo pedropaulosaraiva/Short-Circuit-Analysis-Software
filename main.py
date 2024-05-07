@@ -3,6 +3,7 @@ from analisador_sep.elementos_passivos import LinhaTransmissao, Transformador2En
 from analisador_sep.elementos_ativos import EquivalenteRede
 from analisador_sep.interface_resultados import Iresultados
 from math import cos, sin, radians
+from analisador_sep.numero_pu import cpolar, crec
 
 
 # Número da equipe
@@ -38,10 +39,8 @@ elementos = [
     Transformador2Enro(v_nom_pri=69, v_nom_sec=13.8, s_nom=15, r_pu=0, x_pu=(5.5 + NA/100)*10**(-2), adiantamento_ps=30,
                        nome='TR 03C1', id_barra1=7, id_barra2=8),
 
-    EquivalenteRede(1.0290 * (cos(radians(11.5276)) + 1j*sin(radians(11.5276))), 230, 100, "Eq1",
-                    1, Scc3=19890.7 * (cos(radians(87.0666)) + 1j*sin(radians(87.0666)))),
-    EquivalenteRede(1.0335 * (cos(radians(9.6164)) + 1j*sin(radians(9.6164))), 34.5, 100, "Eq2",
-                    6, Z1_pu=8.6764 * (cos(radians(89.4313)) + 1j*sin(radians(89.4313))))
+    EquivalenteRede(v_base=230, s_base=100, nome="Eq1", id_barra1=1, Scc3=cpolar(19890.734, 89.0666)),
+    EquivalenteRede(v_base=34.5, s_base=100, nome="Eq2", id_barra1=6, Z1_pu=cpolar(8.6764, 89.4313))
 ]
 
 sep.adicionar_elementos(elementos)
@@ -52,3 +51,27 @@ iresultados = Iresultados(sep)
 iresultados.diagrama_impedancias()
 iresultados.matriz_admitancias()
 iresultados.matriz_impedancias()
+
+v_t0_menos = [
+    cpolar(1.0290,11.5276),
+    cpolar(0.9852,6.0130),
+    cpolar(0.9824,4.6215),
+    cpolar(0.9817,3.8909),
+    cpolar(0.9859,4.0049),
+    cpolar(1.0355,9.6164),
+    cpolar(0.9740,3.2654),
+    cpolar(0.9636,-0.9988),
+    cpolar(0.9434,-7.2417),
+]
+
+sep.adicionar_tensoes_pre_falta(v_t0_menos)
+
+sep_curto_s_3 = sep.criar_curto_simetrico(id_barra_curto=2, z_f_ohm=2.101)
+sep_curto_s_4 = sep.criar_curto_simetrico(id_barra_curto=4, z_f_ohm=2.787)
+sep_curto_s_8 = sep.criar_curto_simetrico(id_barra_curto=8, z_f_ohm=0.048)
+
+iresultados = Iresultados(sep_curto_s_4)
+iresultados.curto_circuito_simetrico()
+
+iresultados = Iresultados(sep_curto_s_8)
+iresultados.curto_circuito_simetrico()

@@ -163,5 +163,5 @@ if __name__ == '__main__':
 
     elementos_simplificados = RelacoesSEP.simplificar_rede_de_elementos(elementos, quantidade_barras)
     for elemento in elementos_simplificados:
-        print(elemento)
+        print(elemento.z_ohm)
     print(RelacoesSEP.criacao_matriz_incidencia(elementos_simplificados, quantidade_barras))

@@ -1,6 +1,10 @@
+import copy
+
 import numpy as np
 import analisador_sep.elementos_passivos as elementos_passivos
 from analisador_sep.relacoes_sep import RelacoesSEP
+from analisador_sep.numero_pu import cpolar, crec
+from math import sqrt
 
 
 class Barra:
@@ -10,8 +14,12 @@ class Barra:
         self._v_base = None
         self._s_base = None
 
-        self._v_barra_volts = None
-        self.v_barra_pu = None
+        self._v_barra_pre_falta_pu = None
+        self._v_barra_pos_falta_pu = None
+        self.v_barra_pre_falta_volts = None
+        self.v_barra_pos_falta_volts = None
+
+        self._grupo_vetorial = 0
 
     @property
     def v_base(self):
@@ -30,12 +38,52 @@ class Barra:
         self._s_base = value
 
     @property
-    def v_barra_volts(self):
-        return self._v_barra_volts
+    def v_barra_pre_falta_pu(self):
+        return self._v_barra_pre_falta_pu
 
-    @v_barra_volts.setter
-    def v_barra_volts(self, value):
-        self._v_barra_volts = value
+    @v_barra_pre_falta_pu.setter
+    def v_barra_pre_falta_pu(self, value):
+        # Desconsideração dos grupos vetoriais
+        self._v_barra_pre_falta_pu = value * cpolar(1, -self.grupo_vetorial)
+        self.v_barra_pre_falta_volts = value * self.v_base * cpolar(1, -self.grupo_vetorial)
+
+    @property
+    def v_barra_pos_falta_pu(self):
+        return self._v_barra_pos_falta_pu
+
+    @v_barra_pos_falta_pu.setter
+    def v_barra_pos_falta_pu(self, value):
+        self._v_barra_pos_falta_pu = value
+        self.v_barra_pos_falta_volts = value * self.v_base
+
+    @property
+    def grupo_vetorial(self):
+        return self._grupo_vetorial
+
+    @grupo_vetorial.setter
+    def grupo_vetorial(self, value):
+        self._grupo_vetorial = value
+
+    def calcular_tensoes_pos_falta(self):
+        self.Va_pu = self.v_barra_pos_falta_pu * cpolar(1, self.grupo_vetorial)/(sqrt(3))
+        self.Vb_pu = self.Va_pu * cpolar(1, -120)
+        self.Vc_pu = self.Va_pu * cpolar(1, 120)
+
+        self.Va_volts = (self.v_barra_pos_falta_volts * cpolar(1, self.grupo_vetorial))/(sqrt(3))
+        self.Vb_volts = self.Va_volts * cpolar(1, -120)
+        self.Vc_volts = self.Va_volts * cpolar(1, 120)
+
+        self.Va_pu, self.Vb_pu, self.Vc_pu = crec(self.Va_pu), crec(self.Vb_pu), crec(self.Vc_pu)
+        self.Va_volts, self.Vb_volts, self.Vc_volts = crec(self.Va_volts), crec(self.Vb_volts), crec(self.Vc_volts)
+
+    def __str__(self):
+        return (f"A barra #{self.id_barra} possui as tensões de pós falta:\n"
+                f"    |Va_pu| = {self.Va_pu[0]}@{self.v_base/1000}kV, <Va_pu = {self.Va_pu[1]}°\n"
+                f"    |Vb_pu| = {self.Vb_pu[0]}@{self.v_base/1000}kV, <Vb_pu = {self.Vb_pu[1]}°\n"
+                f"    |Vc_pu| = {self.Vc_pu[0]}@{self.v_base/1000}kV, <Vc_pu = {self.Vc_pu[1]}°\n"
+                f"    |Va_volts| = {self.Va_volts[0]/1000}kV, <Va_volts = {self.Va_volts[1]}°\n"
+                f"    |Vb_volts| = {self.Vb_volts[0]/1000}kV, <Vb_volts = {self.Vb_volts[1]}°\n"
+                f"    |Vc_volts| = {self.Vc_volts[0]/1000}kV, <Vc_volts = {self.Vc_volts[1]}°\n")
 
 
 class SEP:
@@ -98,6 +146,9 @@ class SEP:
                         barra.v_base = v_base
                         barra.s_base = s_base
 
+                        adiantamento_sp = self.barras[elemento.id_barra1].grupo_vetorial - elemento.adiantamento_ps
+                        barra.grupo_vetorial = adiantamento_sp
+
 
                     elif isinstance(elemento, elementos_passivos.Transformador3Enro):
                         elemento: elementos_passivos.Transformador3Enro
@@ -107,11 +158,16 @@ class SEP:
                         barra.v_base = v_base
                         barra.s_base = s_base
 
+                        adiantamento_sp = self.barras[elemento.id_barra1].grupo_vetorial - elemento.adiantamento_ps
+                        barra.grupo_vetorial = adiantamento_sp
                     else:
 
                         barra: Barra = self.barras[elemento.id_barra2]
                         barra.v_base = self.barras[elemento.id_barra1].v_base
                         barra.s_base = s_base
+
+                        barra.grupo_vetorial = self.barras[elemento.id_barra1].grupo_vetorial
+
 
     def definir_pu_elementos(self, elementos: list):
 
@@ -122,6 +178,8 @@ class SEP:
             elemento.v_base = barra_elemento.v_base
             elemento.s_base = barra_elemento.s_base
             elemento.calcular_pu()
+
+            elemento.grupo_vetorial = barra_elemento.grupo_vetorial
 
 
     def criacao_matriz_primitiva_admitancias(self):
@@ -154,3 +212,64 @@ class SEP:
         self.criacao_matriz_primitiva_admitancias()
         self.criacao_matriz_admitancias()
         self.criacao_matriz_impedacias()
+
+    def adicionar_tensoes_pre_falta(self, tensoe_t0_menos):
+        self.tensoes_to_menos = np.zeros((self.quantidade_barras,1), dtype=complex)
+        for index, barra in enumerate(self.barras[1:]):
+            barra.v_barra_pre_falta_pu = tensoe_t0_menos[index]
+            self.tensoes_to_menos[index][0] = barra.v_barra_pre_falta_pu
+
+        barra_terra: Barra = self.barras[0]
+        barra_terra.v_barra_pre_falta_pu = 0
+
+    #
+    # Cálculos de curto circuito
+    #
+
+    def calcular_matriz_corrente_curto(self, id_barra_curto: int, z_f_ohm=0):
+        barra_curto: Barra = self.barras[id_barra_curto]
+
+        v_base = barra_curto.v_base
+        s_base = barra_curto.s_base
+        z_f_pu = z_f_ohm/(v_base**2/s_base)
+
+        tensao_t0_menos = barra_curto.v_barra_pre_falta_pu
+        zth_barra_curto = self.matriz_impedacias[id_barra_curto - 1][id_barra_curto - 1]
+
+        corrente_curto = (tensao_t0_menos)/(z_f_pu+zth_barra_curto)
+
+        matriz_corrente_curto = np.zeros((self.quantidade_barras,1), dtype=complex)
+        matriz_corrente_curto[id_barra_curto - 1][0] = -corrente_curto
+        return matriz_corrente_curto
+
+    def calcular_tensoes_pos_falta(self, id_barra_curto: int, z_f_ohm=0):
+        matriz_corrente_curto = self.calcular_matriz_corrente_curto(id_barra_curto, z_f_ohm)
+        self.tensoes_to_mais = self.tensoes_to_menos + np.matmul(self.matriz_impedacias, matriz_corrente_curto)
+
+        for index, barra in enumerate(self.barras[1:]):
+            barra.v_barra_pos_falta_pu = self.tensoes_to_mais[index]
+
+        barra_terra: Barra = self.barras[0]
+        barra_terra.v_barra_pos_falta_pu = 0
+
+    def atribuir_correntes_pos_falta(self, elementos: list):
+        for elemento in elementos:
+            elemento: elementos_passivos.Elemento2Terminais
+            barra_elemento_inicial: Barra = self.barras[elemento.id_barra1]
+            barra_elemento_final: Barra = self.barras[elemento.id_barra2]
+
+            elemento.v_pos_falta_pu = (barra_elemento_inicial.v_barra_pos_falta_pu -
+                                       barra_elemento_final.v_barra_pos_falta_pu)
+
+            elemento.calcular_pos_falta_corrente()
+
+        for barra in self.barras[1:]:
+            barra.calcular_tensoes_pos_falta()
+
+    def criar_curto_simetrico(self, id_barra_curto: int, z_f_ohm=0):
+        self.id_barra_curto = id_barra_curto
+        self.z_f_ohm = z_f_ohm
+        self.calcular_tensoes_pos_falta(id_barra_curto, z_f_ohm)
+        self.atribuir_correntes_pos_falta(self.elementos)
+
+        return copy.deepcopy(self)

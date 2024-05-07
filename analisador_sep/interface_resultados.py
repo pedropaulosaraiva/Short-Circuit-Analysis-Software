@@ -1,4 +1,5 @@
 from analisador_sep.elementos_rede import SEP
+from analisador_sep.elementos_passivos import Elemento2Terminais
 import numpy as np
 
 class Iresultados:
@@ -32,3 +33,20 @@ class Iresultados:
         else:
             print(np.around(z, decimals=decimais))
         print("===================")
+
+    def curto_circuito_simetrico(self):
+        barras = self.sep.barras
+        elementos = self.sep.elementos
+        print(f"Exibindo resultados do curto simétrico em #{self.sep.id_barra_curto} com impedância de falta"
+              f" {self.sep.z_f_ohm} Ohms")
+        print("===================")
+        print("Tensões nas barras:")
+        for barra in barras[1:]:
+            print(barra)
+        print("===================")
+        print("Correntes nos elementos:")
+        for elemento in elementos:
+            elemento: Elemento2Terminais
+            elemento.print_curto_simetrico()
+
+
