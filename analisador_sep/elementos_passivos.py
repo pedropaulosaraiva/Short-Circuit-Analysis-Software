@@ -76,7 +76,8 @@ class Elemento2Terminais:
         self.Ia_amp, self.Ib_amp, self.Ic_amp = crec(self.Ia_amp), crec(self.Ib_amp), crec(self.Ic_amp)
         
     def print_curto_simetrico(self):
-        print(f'O elemento {self.nome}, possui as correntes de falta:'
+        print(f'O elemento {self.nome}, possui as correntes de falta: '
+              f'(sentido #{self.id_barra1} -> #{self.id_barra2})\n'
                 f"    |Ia_pu| = {self.Ia_pu[0]}@{self.s_base/(sqrt(3) * self.v_base)}A, <Ia_pu = {self.Ia_pu[1]}°\n"
                 f"    |Ib_pu| = {self.Ib_pu[0]}@{self.s_base/(sqrt(3) * self.v_base)}A, <Ib_pu = {self.Ib_pu[1]}°\n"
                 f"    |Ic_pu| = {self.Ic_pu[0]}@{self.s_base/(sqrt(3) * self.v_base)}A, <Ic_pu = {self.Ic_pu[1]}°\n"
@@ -146,7 +147,8 @@ class Transformador2Enro(Elemento2Terminais):
                 f'possui valor em pu: {self.z_pu}@{self.v_base/1000}kV, {self.s_base/10**6}MVA')
 
     def print_curto_simetrico(self):
-        print(f'O transformador {self.nome}, possui as correntes de falta no primário:'
+        print(f'O transformador {self.nome}, possui as correntes de falta no primário: '
+              f'(sentido #{self.id_barra1} -> #{self.id_barra2})\n'
                 f"    |Ia_pu| = {self.Ia_pu[0]}@{self.s_base/(sqrt(3) * self.v_base)}A, <Ia_pu = {self.Ia_pu[1]}°\n"
                 f"    |Ib_pu| = {self.Ib_pu[0]}@{self.s_base/(sqrt(3) * self.v_base)}A, <Ib_pu = {self.Ib_pu[1]}°\n"
                 f"    |Ic_pu| = {self.Ic_pu[0]}@{self.s_base/(sqrt(3) * self.v_base)}A, <Ic_pu = {self.Ic_pu[1]}°\n"
@@ -199,7 +201,8 @@ class Transformador3Enro(Elemento3Terminais):
             pass
 
     def print_curto_simetrico(self):
-        print(f'O transformador {self.nome}, possui as correntes de falta no primário:'
+        print(f'O transformador {self.nome}, possui as correntes de falta no primário: '
+              f'(sentido #{self.id_barra1} -> #{self.id_barra2})\n'
                 f"    |Ia_pu| = {self.Ia_pu[0]}@{self.s_base/(sqrt(3) * self.v_base)}A, <Ia_pu = {self.Ia_pu[1]}°\n"
                 f"    |Ib_pu| = {self.Ib_pu[0]}@{self.s_base/(sqrt(3) * self.v_base)}A, <Ib_pu = {self.Ib_pu[1]}°\n"
                 f"    |Ic_pu| = {self.Ic_pu[0]}@{self.s_base/(sqrt(3) * self.v_base)}A, <Ic_pu = {self.Ic_pu[1]}°\n"

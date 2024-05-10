@@ -44,8 +44,8 @@ class Barra:
     @v_barra_pre_falta_pu.setter
     def v_barra_pre_falta_pu(self, value):
         # Desconsideração dos grupos vetoriais
-        self._v_barra_pre_falta_pu = value * cpolar(1, -self.grupo_vetorial)
-        self.v_barra_pre_falta_volts = value * self.v_base * cpolar(1, -self.grupo_vetorial)
+        self._v_barra_pre_falta_pu = value
+        self.v_barra_pre_falta_volts = value * self.v_base
 
     @property
     def v_barra_pos_falta_pu(self):
@@ -65,11 +65,11 @@ class Barra:
         self._grupo_vetorial = value
 
     def calcular_tensoes_pos_falta(self):
-        self.Va_pu = self.v_barra_pos_falta_pu * cpolar(1, self.grupo_vetorial)/(sqrt(3))
+        self.Va_pu = self.v_barra_pos_falta_pu * cpolar(1, self.grupo_vetorial)
         self.Vb_pu = self.Va_pu * cpolar(1, -120)
         self.Vc_pu = self.Va_pu * cpolar(1, 120)
 
-        self.Va_volts = (self.v_barra_pos_falta_volts * cpolar(1, self.grupo_vetorial))/(sqrt(3))
+        self.Va_volts = (self.v_barra_pos_falta_volts * cpolar(1, self.grupo_vetorial))
         self.Vb_volts = self.Va_volts * cpolar(1, -120)
         self.Vc_volts = self.Va_volts * cpolar(1, 120)
 
@@ -237,6 +237,7 @@ class SEP:
         zth_barra_curto = self.matriz_impedacias[id_barra_curto - 1][id_barra_curto - 1]
 
         corrente_curto = (tensao_t0_menos)/(z_f_pu+zth_barra_curto)
+        self.corrente_curto = corrente_curto
 
         matriz_corrente_curto = np.zeros((self.quantidade_barras,1), dtype=complex)
         matriz_corrente_curto[id_barra_curto - 1][0] = -corrente_curto

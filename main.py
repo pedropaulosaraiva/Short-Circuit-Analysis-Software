@@ -39,8 +39,8 @@ elementos = [
     Transformador2Enro(v_nom_pri=69, v_nom_sec=13.8, s_nom=15, r_pu=0, x_pu=(5.5 + NA/100)*10**(-2), adiantamento_ps=30,
                        nome='TR 03C1', id_barra1=7, id_barra2=8),
 
-    EquivalenteRede(v_base=230, s_base=100, nome="Eq1", id_barra1=1, Scc3=cpolar(19890.734, 89.0666)),
-    EquivalenteRede(v_base=34.5, s_base=100, nome="Eq2", id_barra1=6, Z1_pu=cpolar(8.6764, 89.4313))
+    EquivalenteRede(v_base=230, s_base=100, nome="Eq1", id_barra1=1, Scc3=cpolar(19890.734, 87.0666)),
+    EquivalenteRede(v_base=34.5, s_base=100, nome="Eq2", id_barra1=6, Z1_pu=cpolar(0.086764, 89.4313))
 ]
 
 sep.adicionar_elementos(elementos)

@@ -9,41 +9,42 @@ class Iresultados:
     def diagrama_impedancias(self):
         elementos = self.sep.elementos
         print("Exibindo valores do diagrama de impedancias:")
-        print("===================")
+        print("============================================")
         for elemento in elementos:
             print(elemento)
-        print("===================")
+        print("============================================\n")
 
     def matriz_admitancias(self, decimais=None):
         y: np.array = self.sep.matriz_admitancias
         print("Exibindo matriz de aditâncias:")
-        print("===================")
+        print("==============================")
         if decimais is None:
             print(y)
         else:
             print(np.around(y,decimals=decimais))
-        print("===================")
+        print("==============================\n")
 
     def matriz_impedancias(self, decimais=None):
         z: np.array = self.sep.matriz_impedacias
         print("Exibindo matriz de impedâncias:")
-        print("===================")
+        print("===============================")
         if decimais is None:
             print(z)
         else:
             print(np.around(z, decimals=decimais))
-        print("===================")
+        print("===============================\n")
 
     def curto_circuito_simetrico(self):
         barras = self.sep.barras
         elementos = self.sep.elementos
-        print(f"Exibindo resultados do curto simétrico em #{self.sep.id_barra_curto} com impedância de falta"
+        print(f"Exibindo resultados do curto simétrico em #{self.sep.id_barra_curto}, com impedância de falta"
               f" {self.sep.z_f_ohm} Ohms")
-        print("===================")
+        print(f'If = {self.sep.corrente_curto}')
+        print("===============================================")
         print("Tensões nas barras:")
         for barra in barras[1:]:
             print(barra)
-        print("===================")
+        print("========================")
         print("Correntes nos elementos:")
         for elemento in elementos:
             elemento: Elemento2Terminais
