@@ -66,9 +66,12 @@ v_t0_menos = [
 
 sep.adicionar_tensoes_pre_falta(v_t0_menos)
 
-sep_curto_s_3 = sep.criar_curto_simetrico(id_barra_curto=2, z_f_ohm=2.101)
+sep_curto_s_2 = sep.criar_curto_simetrico(id_barra_curto=2, z_f_ohm=2.101)
 sep_curto_s_4 = sep.criar_curto_simetrico(id_barra_curto=4, z_f_ohm=2.787)
 sep_curto_s_8 = sep.criar_curto_simetrico(id_barra_curto=8, z_f_ohm=0.048)
+
+iresultados = Iresultados(sep_curto_s_2)
+iresultados.curto_circuito_simetrico()
 
 iresultados = Iresultados(sep_curto_s_4)
 iresultados.curto_circuito_simetrico()
