@@ -1,9 +1,8 @@
 from analisador_sep.elementos_rede import SEP
 from analisador_sep.elementos_passivos import LinhaTransmissao, Transformador2Enro, Transformador3Enro
 from analisador_sep.elementos_ativos import EquivalenteRede
-from analisador_sep.interface_resultados import Iresultados
-from math import cos, sin, radians
-from analisador_sep.numero_pu import cpolar, crec
+from analisador_sep.interface_resultados import Iresultados, Interface_latex
+from analisador_sep.numero_pu import cpolar
 
 
 # Número da equipe
@@ -52,7 +51,7 @@ iresultados.diagrama_impedancias()
 iresultados.matriz_admitancias()
 iresultados.matriz_impedancias()
 
-v_t0_menos = [
+v_t0_menos_bar_1 = [
     cpolar(1.0290,11.5276),
     cpolar(0.9852,6.0130),
     cpolar(0.9824,4.6215),
@@ -64,7 +63,7 @@ v_t0_menos = [
     cpolar(0.9434,-7.2417),
 ]
 
-sep.adicionar_tensoes_pre_falta(v_t0_menos)
+sep.adicionar_tensoes_pre_falta(v_t0_menos_bar_1)
 
 sep_curto_s_2 = sep.criar_curto_simetrico(id_barra_curto=2, z_f_ohm=2.101)
 sep_curto_s_4 = sep.criar_curto_simetrico(id_barra_curto=4, z_f_ohm=2.787)

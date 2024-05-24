@@ -237,7 +237,8 @@ class SEP:
         zth_barra_curto = self.matriz_impedacias[id_barra_curto - 1][id_barra_curto - 1]
 
         corrente_curto = (tensao_t0_menos)/(z_f_pu+zth_barra_curto)
-        self.corrente_curto = corrente_curto
+        self.corrente_curto = crec(corrente_curto*cpolar(1, barra_curto.grupo_vetorial))
+
 
         matriz_corrente_curto = np.zeros((self.quantidade_barras,1), dtype=complex)
         matriz_corrente_curto[id_barra_curto - 1][0] = -corrente_curto
