@@ -74,16 +74,7 @@ class Elemento2Terminais:
 
         self.Ia_pu, self.Ib_pu, self.Ic_pu = crec(self.Ia_pu), crec(self.Ib_pu), crec(self.Ic_pu)
         self.Ia_amp, self.Ib_amp, self.Ic_amp = crec(self.Ia_amp), crec(self.Ib_amp), crec(self.Ic_amp)
-        
-    def print_curto_simetrico(self):
-        print(f'O elemento {self.nome}, possui as correntes de falta: '
-              f'(sentido #{self.id_barra1} -> #{self.id_barra2})\n'
-                f"    |Ia_pu| = {self.Ia_pu[0]}@{self.s_base/(sqrt(3) * self.v_base)}A, <Ia_pu = {self.Ia_pu[1]}°\n"
-                f"    |Ib_pu| = {self.Ib_pu[0]}@{self.s_base/(sqrt(3) * self.v_base)}A, <Ib_pu = {self.Ib_pu[1]}°\n"
-                f"    |Ic_pu| = {self.Ic_pu[0]}@{self.s_base/(sqrt(3) * self.v_base)}A, <Ic_pu = {self.Ic_pu[1]}°\n"
-                f"    |Ia_amp| = {self.Ia_amp[0]}A, <Ia_amp = {self.Ia_amp[1]}°\n"
-                f"    |Ib_amp| = {self.Ib_amp[0]}A, <Ib_amp = {self.Ib_amp[1]}°\n"
-                f"    |Ic_amp| = {self.Ic_amp[0]}A, <Ic_amp = {self.Ic_amp[1]}°\n")
+
 
 
 class Elemento3Terminais(Elemento2Terminais):
@@ -102,9 +93,6 @@ class Impedancia(Elemento2Terminais):
             self.id_barra1, self.id_barra2 = self.id_barra2, self.id_barra1
 
 
-    def __str__(self):
-        return (f'A impedância {self.nome} entre as barras #{self.id_barra1} e #{self.id_barra2} com '
-                f'{self.z_ohm} ohms, possui valor em pu: {self.z_pu}@{self.v_base/1000}kV, {self.s_base/10**6}MVA')
 
 
 class LinhaTransmissao(Impedancia):
@@ -115,9 +103,6 @@ class LinhaTransmissao(Impedancia):
 
         super().__init__(self.z_linha, nome, id_barra1, id_barra2)
 
-    def __str__(self):
-        return (f'A linha {self.nome} entre as barras #{self.id_barra1} e #{self.id_barra2} com '
-                f'{self.z_ohm} ohms, possui valor em pu: {self.z_pu}@{self.v_base/1000}kV, {self.s_base/10**6}MVA')
 
     def __truediv__(self, other):
         if not isinstance(other, type(self)):
@@ -142,19 +127,6 @@ class Transformador2Enro(Elemento2Terminais):
         z_pri = self.z_ps_pu*(v_nom_pri**2/s_nom)
         super().__init__(z_pri, nome, id_barra1, id_barra2)
 
-    def __str__(self):
-        return (f'O transformador {self.nome} entre as barras #{self.id_barra1} e #{self.id_barra2},'
-                f'possui valor em pu: {self.z_pu}@{self.v_base/1000}kV, {self.s_base/10**6}MVA')
-
-    def print_curto_simetrico(self):
-        print(f'O transformador {self.nome}, possui as correntes de falta no primário: '
-              f'(sentido #{self.id_barra1} -> #{self.id_barra2})\n'
-                f"    |Ia_pu| = {self.Ia_pu[0]}@{self.s_base/(sqrt(3) * self.v_base)}A, <Ia_pu = {self.Ia_pu[1]}°\n"
-                f"    |Ib_pu| = {self.Ib_pu[0]}@{self.s_base/(sqrt(3) * self.v_base)}A, <Ib_pu = {self.Ib_pu[1]}°\n"
-                f"    |Ic_pu| = {self.Ic_pu[0]}@{self.s_base/(sqrt(3) * self.v_base)}A, <Ic_pu = {self.Ic_pu[1]}°\n"
-                f"    |Ia_amp| = {self.Ia_amp[0]}A, <Ia_amp = {self.Ia_amp[1]}°\n"
-                f"    |Ib_amp| = {self.Ib_amp[0]}A, <Ib_amp = {self.Ib_amp[1]}°\n"
-                f"    |Ic_amp| = {self.Ic_amp[0]}A, <Ic_amp = {self.Ic_amp[1]}°\n")
 
     def __truediv__(self, other):
         if not isinstance(other, type(self)):
@@ -172,16 +144,22 @@ class Transformador2Enro(Elemento2Terminais):
 class Transformador3Enro(Elemento3Terminais):
     def __init__(self, v_nom_pri: float, v_nom_sec: float, v_nom_ter: float, s_nom_pri: float, s_nom_sec: float,
                  r_ps_pu: float, x_ps_pu: float, r_pt_pu: float, x_pt_pu: float, r_st_pu: float, x_st_pu: float,
-                 adiantamento_ps: float, adiantamento_pt: float, nome: str, id_barra1: int, id_barra2: int,
-                 id_barra3=None):
+                 adiantamento_ps: float, adiantamento_pt: float, nome: str,lig: str, id_barra1: int, id_barra2: int,
+                 id_barra3=None, z_n_pu=None):
         if id_barra3 is None:
             self.v_nom_pri = v_nom_pri*1000
             self.v_nom_sec = v_nom_sec*1000
+            self.v_nom_ter = v_nom_ter*1000
 
             self.s_nom_pri = s_nom_pri*10**6
             self.s_nom_sec = s_nom_sec*10**6
+            self.s_nom_ter = self.s_nom_pri - self.s_nom_sec
 
             self.z_ps_pu = complex(r_ps_pu, x_ps_pu)
+            self.z_pt_pu = complex(r_pt_pu, x_pt_pu)
+            self.z_st_pu = complex(r_st_pu, x_st_pu)
+
+            self.lig = lig
 
             self.adiantamento_ps = adiantamento_ps
 
@@ -193,22 +171,24 @@ class Transformador3Enro(Elemento3Terminais):
         else:
             pass
 
-    def __str__(self):
-        if self.id_barra3 is None:
-            return (f'O transformador {self.nome} entre as barras #{self.id_barra1}, #{self.id_barra2} e terciário '
-                    f'em aberto, possui valor em pu: {self.z_pu}@{self.v_base/1000}kV, {self.s_base/10**6}MVA')
+    def transformar_seq0(self):
+        # Mudança de base para a barra do primario
+        self.z_ps_pu_base = self.z_ps_pu * ((self.v_nom_pri/self.v_base)**2)*(self.s_base/self.s_nom_pri)
+        self.z_pt_pu_base = self.z_pt_pu * ((self.v_nom_pri/self.v_base)**2)*(self.s_base/self.s_nom_pri)
+        self.z_st_pu_base_n_refletida = self.z_st_pu * ((self.v_nom_sec/self.v_base)**2)*(self.s_base/self.s_nom_sec)
+        # Reflexão para o primário de z_st
+        self.z_st_pu_base = self.z_st_pu_base_n_refletida*((self.v_nom_pri/self.v_nom_sec)**2)
+
+        self.z_p_pu = (1 / 2) * (self.z_ps_pu_base + self.z_pt_pu_base - self.z_st_pu_base)
+        self.z_s_pu = (1 / 2) * (self.z_ps_pu_base - self.z_pt_pu_base + self.z_st_pu_base)
+        self.z_t_pu = (1 / 2) * (-self.z_ps_pu_base + self.z_pt_pu_base + self.z_st_pu_base)
+
+        if self.lig == 'Ygdd':
+            self.id_barra2 = 0
+            self.z_pu = self.z_p_pu + (((self.z_s_pu) * (self.z_t_pu)) / ((self.z_s_pu) + (self.z_t_pu)))
         else:
             pass
 
-    def print_curto_simetrico(self):
-        print(f'O transformador {self.nome}, possui as correntes de falta no primário: '
-              f'(sentido #{self.id_barra1} -> #{self.id_barra2})\n'
-                f"    |Ia_pu| = {self.Ia_pu[0]}@{self.s_base/(sqrt(3) * self.v_base)}A, <Ia_pu = {self.Ia_pu[1]}°\n"
-                f"    |Ib_pu| = {self.Ib_pu[0]}@{self.s_base/(sqrt(3) * self.v_base)}A, <Ib_pu = {self.Ib_pu[1]}°\n"
-                f"    |Ic_pu| = {self.Ic_pu[0]}@{self.s_base/(sqrt(3) * self.v_base)}A, <Ic_pu = {self.Ic_pu[1]}°\n"
-                f"    |Ia_amp| = {self.Ia_amp[0]}A, <Ia_amp = {self.Ia_amp[1]}°\n"
-                f"    |Ib_amp| = {self.Ib_amp[0]}A, <Ib_amp = {self.Ib_amp[1]}°\n"
-                f"    |Ic_amp| = {self.Ic_amp[0]}A, <Ic_amp = {self.Ic_amp[1]}°\n")
 
     def __truediv__(self, other):
         if not isinstance(other, type(self)):

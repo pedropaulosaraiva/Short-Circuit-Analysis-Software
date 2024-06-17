@@ -15,13 +15,6 @@ class EquivalenteRede(Elemento2Terminais):
         z_ohm = z_pu*(v_base**2/s_base)
 
         super().__init__(z_ohm, nome, id_barra1, 0)
-        # A barra não pode ser terra
+        # A barra 1 não pode ser terra
         if self.id_barra1 == 0:
             self.id_barra1, self.id_barra2 = self.id_barra2, self.id_barra1
-
-    def __str__(self):
-        return (f'O equivalente de rede {self.nome} na barra #{self.id_barra1} com '
-                f'impedância Zth{self.id_barra1} em pu: {self.z_pu}@{self.v_base/1000}kV, {self.s_base/10**6}MVA')
-
-    def print_curto_simetrico(self):
-        pass

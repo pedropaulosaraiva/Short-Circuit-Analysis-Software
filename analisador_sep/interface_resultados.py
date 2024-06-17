@@ -1,7 +1,10 @@
 from analisador_sep.elementos_rede import SEP
-from analisador_sep.elementos_passivos import Elemento2Terminais
+from analisador_sep.elementos_passivos import (Elemento2Terminais, Impedancia, LinhaTransmissao, Transformador2Enro,
+                                               Transformador3Enro)
+from analisador_sep.elementos_ativos import EquivalenteRede
 from analisador_sep.numero_pu import crec
 import numpy as np
+from math import sqrt
 
 class Iresultados:
     def __init__(self, sep: SEP):
@@ -11,8 +14,38 @@ class Iresultados:
         elementos = self.sep.elementos
         print("Exibindo valores do diagrama de impedancias:")
         print("============================================")
+
         for elemento in elementos:
-            print(elemento)
+            elemento: Elemento2Terminais
+
+            if isinstance(elemento, Impedancia):
+                print(f'A impedância {elemento.nome} entre as barras #{elemento.id_barra1} e #{elemento.id_barra2} com '
+                      f'{elemento.z_ohm} ohms, possui valor em pu: {elemento.z_pu}@{elemento.v_base/1000}kV, '
+                      f'{elemento.s_base/10**6}MVA')
+
+            elif isinstance(elemento, LinhaTransmissao):
+                print(f'A linha {elemento.nome} entre as barras #{elemento.id_barra1} e #{elemento.id_barra2} com '
+                      f'{elemento.z_ohm} ohms, possui valor em pu: {elemento.z_pu}@{elemento.v_base/1000}kV, '
+                      f'{elemento.s_base/10**6}MVA')
+
+            elif isinstance(elemento, Transformador2Enro):
+                print(f'O transformador {elemento.nome} entre as barras #{elemento.id_barra1} e #{elemento.id_barra2},'
+                      f'possui valor em pu: {elemento.z_pu}@{elemento.v_base/1000}kV, {elemento.s_base/10**6}MVA')
+
+            elif isinstance(elemento, Transformador3Enro):
+                if elemento.id_barra3 is None:
+                    print(f'O transformador {elemento.nome} entre as barras #{elemento.id_barra1}, '
+                          f'#{elemento.id_barra2} e terciário em aberto, possui valor em pu: '
+                          f'{elemento.z_pu}@{elemento.v_base / 1000}kV, {elemento.s_base / 10 ** 6}MVA')
+
+                else:
+                    pass
+
+            elif isinstance(elemento, EquivalenteRede):
+                print(f'O equivalente de rede {elemento.nome} na barra #{elemento.id_barra1} com impedância Zth'
+                      f'{elemento.id_barra1} em pu: {elemento.z_pu}@{elemento.v_base/1000}kV, '
+                      f'{elemento.s_base/10**6}MVA')
+
         print("============================================\n")
 
     def matriz_admitancias(self, decimais=None):
@@ -45,12 +78,38 @@ class Iresultados:
         print("===============================================")
         print("Tensões nas barras:")
         for barra in barras[1:]:
-            print(barra)
+            print(f"A barra #{barra.id_barra} possui as tensões de pós falta:\n"
+                f"    |Va_pu| = {barra.Va_pu[0]}@{barra.v_base/1000}kV, <Va_pu = {barra.Va_pu[1]}°\n"
+                f"    |Vb_pu| = {barra.Vb_pu[0]}@{barra.v_base/1000}kV, <Vb_pu = {barra.Vb_pu[1]}°\n"
+                f"    |Vc_pu| = {barra.Vc_pu[0]}@{barra.v_base/1000}kV, <Vc_pu = {barra.Vc_pu[1]}°\n"
+                f"    |Va_volts| = {barra.Va_volts[0]/1000}kV, <Va_volts = {barra.Va_volts[1]}°\n"
+                f"    |Vb_volts| = {barra.Vb_volts[0]/1000}kV, <Vb_volts = {barra.Vb_volts[1]}°\n"
+                f"    |Vc_volts| = {barra.Vc_volts[0]/1000}kV, <Vc_volts = {barra.Vc_volts[1]}°\n")
         print("========================")
         print("Correntes nos elementos:")
+        
         for elemento in elementos:
             elemento: Elemento2Terminais
-            elemento.print_curto_simetrico()
+
+            if isinstance(elemento, (Impedancia, LinhaTransmissao)):
+                print(f'O elemento {elemento.nome}, possui as correntes de falta: ')
+
+            elif isinstance(elemento, (Transformador2Enro, Transformador3Enro)):
+                print(f'O transformador {elemento.nome}, possui as correntes de falta no primário: ')
+
+            elif isinstance(elemento, EquivalenteRede):
+                continue
+                
+            print(f"(sentido #{elemento.id_barra1} -> #{elemento.id_barra2})\n"
+                  f"    |Ia_pu| = {elemento.Ia_pu[0]}@{elemento.s_base / (sqrt(3) * elemento.v_base)}A,"
+                  f" <Ia_pu = {elemento.Ia_pu[1]}°\n"
+                  f"    |Ib_pu| = {elemento.Ib_pu[0]}@{elemento.s_base / (sqrt(3) * elemento.v_base)}A,"
+                  f" <Ib_pu = {elemento.Ib_pu[1]}°\n"
+                  f"    |Ic_pu| = {elemento.Ic_pu[0]}@{elemento.s_base / (sqrt(3) * elemento.v_base)}A,"
+                  f" <Ic_pu = {elemento.Ic_pu[1]}°\n"
+                  f"    |Ia_amp| = {elemento.Ia_amp[0]}A, <Ia_amp = {elemento.Ia_amp[1]}°\n"
+                  f"    |Ib_amp| = {elemento.Ib_amp[0]}A, <Ib_amp = {elemento.Ib_amp[1]}°\n"
+                  f"    |Ic_amp| = {elemento.Ic_amp[0]}A, <Ic_amp = {elemento.Ic_amp[1]}°\n")
 
 
     def salvar_matriz_impedancia_csv(self):

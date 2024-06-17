@@ -76,15 +76,6 @@ class Barra:
         self.Va_pu, self.Vb_pu, self.Vc_pu = crec(self.Va_pu), crec(self.Vb_pu), crec(self.Vc_pu)
         self.Va_volts, self.Vb_volts, self.Vc_volts = crec(self.Va_volts), crec(self.Vb_volts), crec(self.Vc_volts)
 
-    def __str__(self):
-        return (f"A barra #{self.id_barra} possui as tensões de pós falta:\n"
-                f"    |Va_pu| = {self.Va_pu[0]}@{self.v_base/1000}kV, <Va_pu = {self.Va_pu[1]}°\n"
-                f"    |Vb_pu| = {self.Vb_pu[0]}@{self.v_base/1000}kV, <Vb_pu = {self.Vb_pu[1]}°\n"
-                f"    |Vc_pu| = {self.Vc_pu[0]}@{self.v_base/1000}kV, <Vc_pu = {self.Vc_pu[1]}°\n"
-                f"    |Va_volts| = {self.Va_volts[0]/1000}kV, <Va_volts = {self.Va_volts[1]}°\n"
-                f"    |Vb_volts| = {self.Vb_volts[0]/1000}kV, <Vb_volts = {self.Vb_volts[1]}°\n"
-                f"    |Vc_volts| = {self.Vc_volts[0]/1000}kV, <Vc_volts = {self.Vc_volts[1]}°\n")
-
 
 class SEP:
     def __init__(self, quantidade_barras: int, s_base: float, v_base_barra_1: float):
@@ -241,7 +232,7 @@ class SEP:
             barra.v_barra_pre_falta_pu = self.tensoes_to_menos[index][0]
 
 
-    def referenciar_grupo_elementos_no_curto(self, id_barra_curto: int, elementos):
+    def referenciar_grupo_elementos_no_curto(self, elementos):
         # Mudança do referencial nos grupos vetoriais dos elementos
         for elemento in elementos:
             elemento: elementos_passivos.Elemento2Terminais
@@ -275,8 +266,8 @@ class SEP:
         barra_terra: Barra = self.barras[0]
         barra_terra.v_barra_pos_falta_pu = 0
 
-    def atribuir_correntes_pos_falta(self, elementos: list):
-        self.referenciar_grupo_elementos_no_curto(self.id_barra_curto, elementos)
+    def atribuir_correntes_pos_falta(self, elementos):
+        self.referenciar_grupo_elementos_no_curto(elementos)
 
         for elemento in elementos:
             elemento: elementos_passivos.Elemento2Terminais
