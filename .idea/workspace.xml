@@ -6,6 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="dbb3561d-d3d3-491a-8511-5030fcf97924" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/analisador_sep/elementos_rede.py" beforeDir="false" afterPath="$PROJECT_DIR$/analisador_sep/elementos_rede.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/analisador_sep/interface_resultados.py" beforeDir="false" afterPath="$PROJECT_DIR$/analisador_sep/interface_resultados.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -23,18 +25,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "pedropaulosaraiva"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;pedropaulosaraiva&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/pedropaulosaraiva/Trabalho01_SEP",
-    "accountId": "3d7b637c-1ccd-4473-a8c3-11c097820b46"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/pedropaulosaraiva/Trabalho01_SEP&quot;,
+    &quot;accountId&quot;: &quot;3d7b637c-1ccd-4473-a8c3-11c097820b46&quot;
   }
-}]]></component>
+}</component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 0
 }</component>
@@ -48,8 +50,10 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;Python.interface_resultados.executor&quot;: &quot;Run&quot;,
     &quot;Python.main.executor&quot;: &quot;Run&quot;,
     &quot;Python.questao_slide_sep.executor&quot;: &quot;Run&quot;,
+    &quot;Python.rascunho.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
@@ -103,7 +107,10 @@
       <option name="presentableId" value="Default" />
       <updated>1714842196754</updated>
       <workItem from="1715386875076" duration="15218000" />
-      <workItem from="1715863465996" duration="6814000" />
+      <workItem from="1715863465996" duration="36848000" />
+      <workItem from="1717096845500" duration="111000" />
+      <workItem from="1717096968646" duration="4000" />
+      <workItem from="1717972570469" duration="12740000" />
     </task>
     <servers />
   </component>
@@ -111,7 +118,9 @@
     <option name="version" value="3" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/Trabalho01_SEP$main.coverage" NAME="main Coverage Results" MODIFIED="1715973725148" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Trabalho01_SEP$main.coverage" NAME="main Coverage Results" MODIFIED="1718020073332" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Trabalho01_SEP$questao_slide_sep.coverage" NAME="questao_slide_sep Coverage Results" MODIFIED="1715707161338" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Trabalho01_SEP$interface_resultados.coverage" NAME="interface_resultados Coverage Results" MODIFIED="1716666713665" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/analisador_sep" />
+    <SUITE FILE_PATH="coverage/Trabalho01_SEP$rascunho.coverage" NAME="rascunho Coverage Results" MODIFIED="1716747311052" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

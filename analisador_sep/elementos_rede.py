@@ -175,6 +175,7 @@ class SEP:
             elemento: elementos_passivos.Elemento2Terminais
             barra_elemento: Barra = self.barras[elemento.id_barra1]
 
+
             elemento.v_base = barra_elemento.v_base
             elemento.s_base = barra_elemento.s_base
             elemento.calcular_pu()
