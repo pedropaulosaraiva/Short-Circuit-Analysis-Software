@@ -227,6 +227,26 @@ class SEP:
     # Cálculos de curto circuito
     #
 
+    def refereciar_vto_menos_no_curto(self, id_barra_curto: int):
+        barra_curto: Barra = self.barras[id_barra_curto]
+        grupo_referencial = barra_curto.grupo_vetorial
+        self.grupo_referencial_curto = grupo_referencial
+
+        # Mudança do referencial em vto_menos
+        for index, barra in enumerate(self.barras[1:]):
+
+            self.tensoes_to_menos[index][0] = self.tensoes_to_menos[index][0] * cpolar(1, grupo_referencial)
+
+            barra.grupo_vetorial = barra.grupo_vetorial - grupo_referencial
+            barra.v_barra_pre_falta_pu = self.tensoes_to_menos[index][0]
+
+
+    def referenciar_grupo_elementos_no_curto(self, id_barra_curto: int, elementos):
+        # Mudança do referencial nos grupos vetoriais dos elementos
+        for elemento in elementos:
+            elemento: elementos_passivos.Elemento2Terminais
+
+            elemento.grupo_vetorial = elemento.grupo_vetorial - self.grupo_referencial_curto
     def calcular_matriz_corrente_curto(self, id_barra_curto: int, z_f_ohm=0):
         barra_curto: Barra = self.barras[id_barra_curto]
 
@@ -234,15 +254,15 @@ class SEP:
         s_base = barra_curto.s_base
         z_f_pu = z_f_ohm/(v_base**2/s_base)
 
+        self.refereciar_vto_menos_no_curto(id_barra_curto)
+
         tensao_t0_menos = barra_curto.v_barra_pre_falta_pu
         zth_barra_curto = self.matriz_impedacias[id_barra_curto - 1][id_barra_curto - 1]
 
-        corrente_curto = (tensao_t0_menos)/(z_f_pu+zth_barra_curto)
-        self.corrente_curto = crec(corrente_curto*cpolar(1, barra_curto.grupo_vetorial))
-
+        self.corrente_curto = (tensao_t0_menos)/(z_f_pu + zth_barra_curto)
 
         matriz_corrente_curto = np.zeros((self.quantidade_barras,1), dtype=complex)
-        matriz_corrente_curto[id_barra_curto - 1][0] = -corrente_curto
+        matriz_corrente_curto[id_barra_curto - 1][0] = -self.corrente_curto
         return matriz_corrente_curto
 
     def calcular_tensoes_pos_falta(self, id_barra_curto: int, z_f_ohm=0):
@@ -256,6 +276,8 @@ class SEP:
         barra_terra.v_barra_pos_falta_pu = 0
 
     def atribuir_correntes_pos_falta(self, elementos: list):
+        self.referenciar_grupo_elementos_no_curto(self.id_barra_curto, elementos)
+
         for elemento in elementos:
             elemento: elementos_passivos.Elemento2Terminais
             barra_elemento_inicial: Barra = self.barras[elemento.id_barra1]

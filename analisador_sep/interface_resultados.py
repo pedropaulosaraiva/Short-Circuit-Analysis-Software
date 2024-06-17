@@ -1,5 +1,6 @@
 from analisador_sep.elementos_rede import SEP
 from analisador_sep.elementos_passivos import Elemento2Terminais
+from analisador_sep.numero_pu import crec
 import numpy as np
 
 class Iresultados:
@@ -37,9 +38,10 @@ class Iresultados:
     def curto_circuito_simetrico(self):
         barras = self.sep.barras
         elementos = self.sep.elementos
+        corrente_curto = crec(self.sep.corrente_curto)
         print(f"Exibindo resultados do curto simétrico em #{self.sep.id_barra_curto}, com impedância de falta"
               f" {self.sep.z_f_ohm} Ohms")
-        print(f'If = {self.sep.corrente_curto[0]}<{self.sep.corrente_curto[1]}º')
+        print(f'If = {corrente_curto[0]}<{corrente_curto[1]}º')
         print("===============================================")
         print("Tensões nas barras:")
         for barra in barras[1:]:

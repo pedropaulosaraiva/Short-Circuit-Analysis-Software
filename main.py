@@ -54,15 +54,15 @@ iresultados.matriz_impedancias()
 
 
 v_t0_menos_bar_1 = [
-    cpolar(1.0290,11.5276),
-    cpolar(0.9852,6.0130),
-    cpolar(0.9824,4.6215),
-    cpolar(0.9817,3.8909),
-    cpolar(0.9859,4.0049),
-    cpolar(1.0355,9.6164),
-    cpolar(0.9740,3.2654),
-    cpolar(0.9636,-0.9988),
-    cpolar(0.9434,-7.2417),
+    cpolar(1.0290, 11.5276),
+    cpolar(0.9852, 6.0130),
+    cpolar(0.9824, 4.6215),
+    cpolar(0.9817, 3.8909),
+    cpolar(0.9859, 4.0049),
+    cpolar(1.0355, 9.6164),
+    cpolar(0.9740, 3.2654),
+    cpolar(0.9636, -0.9988),
+    cpolar(0.9434, -7.2417),
 ]
 
 sep.adicionar_tensoes_pre_falta(v_t0_menos_bar_1)
