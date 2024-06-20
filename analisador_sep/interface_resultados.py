@@ -1,4 +1,4 @@
-from analisador_sep.elementos_rede import SEP
+from analisador_sep.elementos_rede import SEP, SEP_positivo, SEP_negativo, SEP_0
 from analisador_sep.elementos_passivos import (Elemento2Terminais, Impedancia, LinhaTransmissao, Transformador2Enro,
                                                Transformador3Enro)
 from analisador_sep.elementos_ativos import EquivalenteRede
@@ -9,10 +9,22 @@ from math import sqrt
 class Iresultados:
     def __init__(self, sep: SEP):
         self.sep = sep
+        self.nome_seq = ''
+        self.nome_seq_abr = ''
+        if type(self.sep) is SEP_positivo:
+            self.nome_seq = ' (sequência positiva)'
+            self.nome_seq_abr = '(+)'
+        elif type(self.sep) is SEP_negativo:
+            self.nome_seq = ' (sequência negativa)'
+            self.nome_seq_abr = '(-)'
+        elif type(self.sep) is SEP_0:
+            self.nome_seq = ' (sequência zero)'
+            self.nome_seq_abr = '(0)'
 
     def diagrama_impedancias(self):
         elementos = self.sep.elementos
-        print("Exibindo valores do diagrama de impedancias:")
+
+        print(f"Valores do diagrama de impedancias{self.nome_seq}:")
         print("============================================")
 
         for elemento in elementos:
@@ -50,7 +62,7 @@ class Iresultados:
 
     def matriz_admitancias(self, decimais=None):
         y: np.array = self.sep.matriz_admitancias
-        print("Exibindo matriz de aditâncias:")
+        print(f"Matriz de aditâncias{self.nome_seq}:")
         print("==============================")
         if decimais is None:
             print(y)
@@ -60,7 +72,7 @@ class Iresultados:
 
     def matriz_impedancias(self, decimais=None):
         z: np.array = self.sep.matriz_impedacias
-        print("Exibindo matriz de impedâncias:")
+        print(f"Matriz de impedâncias{self.nome_seq}:")
         print("===============================")
         if decimais is None:
             print(z)
@@ -68,48 +80,58 @@ class Iresultados:
             print(np.around(z, decimals=decimais))
         print("===============================\n")
 
-    def curto_circuito_simetrico(self):
+    def curto_circuito(self):
         barras = self.sep.barras
         elementos = self.sep.elementos
         corrente_curto = crec(self.sep.corrente_curto)
-        print(f"Exibindo resultados do curto simétrico em #{self.sep.id_barra_curto}, com impedância de falta"
-              f" {self.sep.z_f_ohm} Ohms")
+        print(f"Resultados do curto em #{self.sep.id_barra_curto}, com impedância de falta"
+              f" {self.sep.z_f_ohm} Ohms{self.nome_seq}:")
         print(f'If = {corrente_curto[0]}<{corrente_curto[1]}º')
         print("===============================================")
         print("Tensões nas barras:")
         for barra in barras[1:]:
-            print(f"A barra #{barra.id_barra} possui as tensões de pós falta:\n"
-                f"    |Va_pu| = {barra.Va_pu[0]}@{barra.v_base/1000}kV, <Va_pu = {barra.Va_pu[1]}°\n"
-                f"    |Vb_pu| = {barra.Vb_pu[0]}@{barra.v_base/1000}kV, <Vb_pu = {barra.Vb_pu[1]}°\n"
-                f"    |Vc_pu| = {barra.Vc_pu[0]}@{barra.v_base/1000}kV, <Vc_pu = {barra.Vc_pu[1]}°\n"
-                f"    |Va_volts| = {barra.Va_volts[0]/1000}kV, <Va_volts = {barra.Va_volts[1]}°\n"
-                f"    |Vb_volts| = {barra.Vb_volts[0]/1000}kV, <Vb_volts = {barra.Vb_volts[1]}°\n"
-                f"    |Vc_volts| = {barra.Vc_volts[0]/1000}kV, <Vc_volts = {barra.Vc_volts[1]}°\n")
+            barra.Va_pu, barra.Vb_pu, barra.Vc_pu = (crec(barra.Va_pu),
+                                                     crec(barra.Vb_pu), crec(barra.Vc_pu))
+            barra.Va_volts, barra.Vb_volts, barra.Vc_volts = (crec(barra.Va_volts),
+                                                              crec(barra.Vb_volts), crec(barra.Vc_volts))
+            
+            print(f"A barra #{barra.id_barra} possui as tensões de pós falta{self.nome_seq}:\n"
+                f"    |Va_pu|{self.nome_seq_abr} = {barra.Va_pu[0]}@{barra.v_base/1000}kV, <Va_pu = {barra.Va_pu[1]}°\n"
+                f"    |Vb_pu|{self.nome_seq_abr} = {barra.Vb_pu[0]}@{barra.v_base/1000}kV, <Vb_pu = {barra.Vb_pu[1]}°\n"
+                f"    |Vc_pu|{self.nome_seq_abr} = {barra.Vc_pu[0]}@{barra.v_base/1000}kV, <Vc_pu = {barra.Vc_pu[1]}°\n"
+                f"    |Va_volts|{self.nome_seq_abr} = {barra.Va_volts[0]/1000}kV, <Va_volts = {barra.Va_volts[1]}°\n"
+                f"    |Vb_volts|{self.nome_seq_abr} = {barra.Vb_volts[0]/1000}kV, <Vb_volts = {barra.Vb_volts[1]}°\n"
+                f"    |Vc_volts|{self.nome_seq_abr} = {barra.Vc_volts[0]/1000}kV, <Vc_volts = {barra.Vc_volts[1]}°\n")
         print("========================")
         print("Correntes nos elementos:")
         
         for elemento in elementos:
             elemento: Elemento2Terminais
 
+            elemento.Ia_pu, elemento.Ib_pu, elemento.Ic_pu = (crec(elemento.Ia_pu),
+                                                              crec(elemento.Ib_pu), crec(elemento.Ic_pu))
+            elemento.Ia_amp, elemento.Ib_amp, elemento.Ic_amp = (crec(elemento.Ia_amp),
+                                                                 crec(elemento.Ib_amp), crec(elemento.Ic_amp))
+
             if isinstance(elemento, (Impedancia, LinhaTransmissao)):
-                print(f'O elemento {elemento.nome}, possui as correntes de falta: ')
+                print(f'O elemento {elemento.nome}, possui as correntes de falta{self.nome_seq}:')
 
             elif isinstance(elemento, (Transformador2Enro, Transformador3Enro)):
-                print(f'O transformador {elemento.nome}, possui as correntes de falta no primário: ')
+                print(f'O transformador {elemento.nome}, possui as correntes de falta no primário{self.nome_seq}:')
 
             elif isinstance(elemento, EquivalenteRede):
                 continue
                 
             print(f"(sentido #{elemento.id_barra1} -> #{elemento.id_barra2})\n"
-                  f"    |Ia_pu| = {elemento.Ia_pu[0]}@{elemento.s_base / (sqrt(3) * elemento.v_base)}A,"
+                  f"    |Ia_pu|{self.nome_seq_abr} = {elemento.Ia_pu[0]}@{elemento.s_base / (sqrt(3) * elemento.v_base)}A,"
                   f" <Ia_pu = {elemento.Ia_pu[1]}°\n"
-                  f"    |Ib_pu| = {elemento.Ib_pu[0]}@{elemento.s_base / (sqrt(3) * elemento.v_base)}A,"
+                  f"    |Ib_pu|{self.nome_seq_abr} = {elemento.Ib_pu[0]}@{elemento.s_base / (sqrt(3) * elemento.v_base)}A,"
                   f" <Ib_pu = {elemento.Ib_pu[1]}°\n"
-                  f"    |Ic_pu| = {elemento.Ic_pu[0]}@{elemento.s_base / (sqrt(3) * elemento.v_base)}A,"
+                  f"    |Ic_pu|{self.nome_seq_abr} = {elemento.Ic_pu[0]}@{elemento.s_base / (sqrt(3) * elemento.v_base)}A,"
                   f" <Ic_pu = {elemento.Ic_pu[1]}°\n"
-                  f"    |Ia_amp| = {elemento.Ia_amp[0]}A, <Ia_amp = {elemento.Ia_amp[1]}°\n"
-                  f"    |Ib_amp| = {elemento.Ib_amp[0]}A, <Ib_amp = {elemento.Ib_amp[1]}°\n"
-                  f"    |Ic_amp| = {elemento.Ic_amp[0]}A, <Ic_amp = {elemento.Ic_amp[1]}°\n")
+                  f"    |Ia_amp|{self.nome_seq_abr} = {elemento.Ia_amp[0]}A, <Ia_amp = {elemento.Ia_amp[1]}°\n"
+                  f"    |Ib_amp|{self.nome_seq_abr} = {elemento.Ib_amp[0]}A, <Ib_amp = {elemento.Ib_amp[1]}°\n"
+                  f"    |Ic_amp|{self.nome_seq_abr} = {elemento.Ic_amp[0]}A, <Ic_amp = {elemento.Ic_amp[1]}°\n")
 
 
     def salvar_matriz_impedancia_csv(self):

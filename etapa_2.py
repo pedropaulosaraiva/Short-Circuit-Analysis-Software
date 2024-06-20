@@ -57,15 +57,39 @@ elementos = [
 ]
 
 sep.adicionar_elementos(elementos)
+
 sep.solve_z_barra()
 
-iresultados = Iresultados(sep)
+# iresultados = Iresultados(sep)
+#
+# iresultados.diagrama_impedancias()
+#
+# iresultados.matriz_admitancias()
+# iresultados.matriz_impedancias()
 
-iresultados.diagrama_impedancias()
+# Diagramas de sequência
+sep.solve_z_barra_sequencias()
 
-iresultados.matriz_admitancias()
-iresultados.matriz_impedancias()
+# iresultados_positiva = Iresultados(sep.sep_seq_positiva)
+#
+# iresultados_positiva.diagrama_impedancias()
+#
+# iresultados_positiva.matriz_admitancias()
+# iresultados_positiva.matriz_impedancias()
 
+iresultados_negativa = Iresultados(sep.sep_seq_negativa)
+
+iresultados_negativa.diagrama_impedancias()
+
+iresultados_negativa.matriz_admitancias()
+iresultados_negativa.matriz_impedancias()
+
+iresultados_zero = Iresultados(sep.sep_seq_zero)
+
+iresultados_zero.diagrama_impedancias()
+
+iresultados_zero.matriz_admitancias()
+iresultados_zero.matriz_impedancias()
 
 v_t0_menos_bar_1 = [
     cpolar(1.0290, 11.5276),
@@ -81,18 +105,41 @@ v_t0_menos_bar_1 = [
 
 sep.adicionar_tensoes_pre_falta(v_t0_menos_bar_1)
 
-sep_curto_s_2 = sep.criar_curto_trifasico(id_barra_curto=2, z_f_ohm=2.101)
-sep_curto_s_4 = sep.criar_curto_trifasico(id_barra_curto=4, z_f_ohm=2.787)
-sep_curto_s_8 = sep.criar_curto_trifasico(id_barra_curto=8, z_f_ohm=0.048)
+sep_curto_ft_7 = sep.criar_curto_fase_terra(7, 1.029)
 
-iresultados = Iresultados(sep_curto_s_2)
-iresultados.curto_circuito()
+iresultados_curto = Iresultados(sep_curto_ft_7)
+iresultados_curto_p = Iresultados(sep_curto_ft_7.sep_seq_positiva)
+iresultados_curto_n = Iresultados(sep_curto_ft_7.sep_seq_negativa)
+iresultados_curto_z = Iresultados(sep_curto_ft_7.sep_seq_zero)
 
-iresultados = Iresultados(sep_curto_s_4)
-iresultados.curto_circuito()
 
-iresultados = Iresultados(sep_curto_s_8)
-iresultados.curto_circuito()
+iresultados_curto_p.curto_circuito()
+iresultados_curto_n.curto_circuito()
+iresultados_curto_z.curto_circuito()
+iresultados_curto.curto_circuito()
 
-# ilatex = Interface_latex(sep_curto_s_2, sep_curto_s_4, sep_curto_s_8)
-# iresultados.salvar_matriz_impedancia_csv()
+sep_curto_ff_2 = sep.criar_curto_fase_fase(2, 0.917)
+
+iresultados_curto = Iresultados(sep_curto_ff_2)
+iresultados_curto_p = Iresultados(sep_curto_ff_2.sep_seq_positiva)
+iresultados_curto_n = Iresultados(sep_curto_ff_2.sep_seq_negativa)
+iresultados_curto_z = Iresultados(sep_curto_ff_2.sep_seq_zero)
+
+
+iresultados_curto_p.curto_circuito()
+iresultados_curto_n.curto_circuito()
+iresultados_curto_z.curto_circuito()
+iresultados_curto.curto_circuito()
+
+sep_curto_fft_9 = sep.criar_curto_fase_fase_terra(9, 1.429)
+
+iresultados_curto = Iresultados(sep_curto_fft_9)
+iresultados_curto_p = Iresultados(sep_curto_fft_9.sep_seq_positiva)
+iresultados_curto_n = Iresultados(sep_curto_fft_9.sep_seq_negativa)
+iresultados_curto_z = Iresultados(sep_curto_fft_9.sep_seq_zero)
+
+
+iresultados_curto_p.curto_circuito()
+iresultados_curto_n.curto_circuito()
+iresultados_curto_z.curto_circuito()
+iresultados_curto.curto_circuito()
