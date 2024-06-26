@@ -51,9 +51,9 @@ elementos = [
                              Scc3=cpolar(19890.734, 87.0666),
                              Scc1=cpolar(8848.9946, 87.0790)),
     EquivalenteRede(v_base=34.5, s_base=100, nome="Eq2", id_barra1=6, z_1_pu=cpolar(0.086764, 89.4313),
-                    z_0_pu=cpolar(4.7718, 90)),
+                    z_0_pu=4.7718j/100),
 
-    TransformadorAterramento(z_pu_at=(5.8j*NA*10**(-2)), nome='TR 01A1', id_barra1=3, v_nom=69, s_nom=20)
+    TransformadorAterramento(z_pu_at=1j*(5.8 + NA*10**(-2))*10**(-2), nome='TR 01A1', id_barra1=3, v_nom=69, s_nom=20)
 ]
 
 sep.adicionar_elementos(elementos)
@@ -143,3 +143,27 @@ iresultados_curto_p.curto_circuito()
 iresultados_curto_n.curto_circuito()
 iresultados_curto_z.curto_circuito()
 iresultados_curto.curto_circuito()
+
+sep_aberto_f_45 = sep.abrir_uma_fase(4, 5)
+
+iresultados_curto = Iresultados(sep_aberto_f_45)
+iresultados_curto_p = Iresultados(sep_aberto_f_45.sep_seq_positiva)
+iresultados_curto_n = Iresultados(sep_aberto_f_45.sep_seq_negativa)
+iresultados_curto_z = Iresultados(sep_aberto_f_45.sep_seq_zero)
+
+iresultados_curto_p.curto_abertura_condutor()
+iresultados_curto_n.curto_abertura_condutor()
+iresultados_curto_z.curto_abertura_condutor()
+iresultados_curto.curto_abertura_condutor()
+
+sep_aberto_ff_47 = sep.abrir_duas_fases(4, 7)
+
+iresultados_curto = Iresultados(sep_aberto_ff_47)
+iresultados_curto_p = Iresultados(sep_aberto_ff_47.sep_seq_positiva)
+iresultados_curto_n = Iresultados(sep_aberto_ff_47.sep_seq_negativa)
+iresultados_curto_z = Iresultados(sep_aberto_ff_47.sep_seq_zero)
+
+iresultados_curto_p.curto_abertura_condutor()
+iresultados_curto_n.curto_abertura_condutor()
+iresultados_curto_z.curto_abertura_condutor()
+iresultados_curto.curto_abertura_condutor()

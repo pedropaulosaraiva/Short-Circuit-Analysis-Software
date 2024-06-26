@@ -68,9 +68,9 @@ class Elemento2Terminais:
         self.Ib_pu = I_z + I_p * cpolar(1, -120) + I_n * cpolar(1, 120)
         self.Ic_pu = I_z + I_p * cpolar(1, 120) + I_n * cpolar(1, -120)
 
-        self.Ia_amp = self.Ia_pu * self.v_base
-        self.Ib_amp = self.Ib_pu * self.v_base
-        self.Ic_amp = self.Ic_pu * self.v_base
+        self.Ia_amp = self.Ia_pu * (self.s_base/(self.v_base*sqrt(3)))
+        self.Ib_amp = self.Ib_pu * (self.s_base/(self.v_base*sqrt(3)))
+        self.Ic_amp = self.Ic_pu * (self.s_base/(self.v_base*sqrt(3)))
 
 
 class Elemento3Terminais(Elemento2Terminais):
@@ -149,6 +149,8 @@ class Transformador2Enro(Elemento2Terminais):
 
     def transformar_seq0(self):
         if self.lig == 'Dyg':
+            # Reflexão da impedancia
+            self.z_ohm = self.z_ohm * (self.v_nom_sec/self.v_nom_pri)**2
             self.id_barra1 = self.id_barra2
             self.id_barra2 = 0
         else:

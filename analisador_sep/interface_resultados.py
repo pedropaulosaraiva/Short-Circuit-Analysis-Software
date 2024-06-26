@@ -86,7 +86,7 @@ class Iresultados:
         corrente_curto = crec(self.sep.corrente_curto)
         print(f"Resultados do curto em #{self.sep.id_barra_curto}, com impedância de falta"
               f" {self.sep.z_f_ohm} Ohms{self.nome_seq}:")
-        print(f'If = {corrente_curto[0]}<{corrente_curto[1]}º')
+        print(f'If{self.nome_seq_abr} = {corrente_curto[0]}<{corrente_curto[1]}º')
         print("===============================================")
         print("Tensões nas barras:")
         for barra in barras[1:]:
@@ -132,6 +132,31 @@ class Iresultados:
                   f"    |Ia_amp|{self.nome_seq_abr} = {elemento.Ia_amp[0]}A, <Ia_amp = {elemento.Ia_amp[1]}°\n"
                   f"    |Ib_amp|{self.nome_seq_abr} = {elemento.Ib_amp[0]}A, <Ib_amp = {elemento.Ib_amp[1]}°\n"
                   f"    |Ic_amp|{self.nome_seq_abr} = {elemento.Ic_amp[0]}A, <Ic_amp = {elemento.Ic_amp[1]}°\n")
+
+    def curto_abertura_condutor(self):
+        barras = self.sep.barras
+        elementos = self.sep.elementos
+
+        print(f"Resultados da abetura de fase(s) entre #{self.sep.id_aberto_1} e #{self.sep.id_aberto_2} "
+              f"({self.nome_seq}):")
+
+        print("===============================================")
+        print("Tensões nas barras:")
+        for barra in barras[1:]:
+            barra.Va_pu, barra.Vb_pu, barra.Vc_pu = (crec(barra.Va_pu),
+                                                     crec(barra.Vb_pu), crec(barra.Vc_pu))
+            barra.Va_volts, barra.Vb_volts, barra.Vc_volts = (crec(barra.Va_volts),
+                                                              crec(barra.Vb_volts), crec(barra.Vc_volts))
+
+            print(f"A barra #{barra.id_barra} possui as tensões de pós falta{self.nome_seq}:\n"
+                  f"    |Va_pu|{self.nome_seq_abr} = {barra.Va_pu[0]}@{barra.v_base / 1000}kV, <Va_pu = {barra.Va_pu[1]}°\n"
+                  f"    |Vb_pu|{self.nome_seq_abr} = {barra.Vb_pu[0]}@{barra.v_base / 1000}kV, <Vb_pu = {barra.Vb_pu[1]}°\n"
+                  f"    |Vc_pu|{self.nome_seq_abr} = {barra.Vc_pu[0]}@{barra.v_base / 1000}kV, <Vc_pu = {barra.Vc_pu[1]}°\n"
+                  f"    |Va_volts|{self.nome_seq_abr} = {barra.Va_volts[0] / 1000}kV, <Va_volts = {barra.Va_volts[1]}°\n"
+                  f"    |Vb_volts|{self.nome_seq_abr} = {barra.Vb_volts[0] / 1000}kV, <Vb_volts = {barra.Vb_volts[1]}°\n"
+                  f"    |Vc_volts|{self.nome_seq_abr} = {barra.Vc_volts[0] / 1000}kV, <Vc_volts = {barra.Vc_volts[1]}°\n")
+        print("========================")
+
 
 
     def salvar_matriz_impedancia_csv(self):

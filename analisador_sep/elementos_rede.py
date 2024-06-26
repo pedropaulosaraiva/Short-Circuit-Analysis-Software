@@ -277,7 +277,7 @@ class SEP:
     # Cálculos de curto circuito
     #
 
-    def referenciar_sistema_no_curto(self, id_barra_curto: int, z_f_ohm: complex):
+    def referenciar_sistema_no_curto(self, id_barra_curto: int, z_f_ohm=0j):
         # Barra de curto
         self.id_barra_curto = id_barra_curto
         barra_curto: Barra = self.barras[self.id_barra_curto]
@@ -435,49 +435,197 @@ class SEP:
 
     def criar_curto_fase_terra(self, id_barra_curto: int, z_f_ohm=0):
 
-        self.referenciar_sistema_no_curto(id_barra_curto, z_f_ohm)
+        sep_ft = copy.deepcopy(self)
 
-        self.calcular_corrente_curto_fase_terra()
+        sep_ft.referenciar_sistema_no_curto(id_barra_curto, z_f_ohm)
 
-        self.sep_seq_zero.corrente_curto = self.corrente_curto[0]
-        self.sep_seq_positiva.corrente_curto = self.corrente_curto[1]
-        self.sep_seq_negativa.corrente_curto = self.corrente_curto[2]
-        self.corrente_curto = self.corrente_curto[0] + self.corrente_curto[1] + self.corrente_curto[2]
+        sep_ft.calcular_corrente_curto_fase_terra()
 
-        self.criar_curto_assimetrico(id_barra_curto, z_f_ohm)
+        sep_ft.sep_seq_zero.corrente_curto = sep_ft.corrente_curto[0]
+        sep_ft.sep_seq_positiva.corrente_curto = sep_ft.corrente_curto[1]
+        sep_ft.sep_seq_negativa.corrente_curto = sep_ft.corrente_curto[2]
+        sep_ft.corrente_curto = sep_ft.corrente_curto[0] + sep_ft.corrente_curto[1] + sep_ft.corrente_curto[2]
 
-        return copy.deepcopy(self)
+        sep_ft.criar_curto_assimetrico(id_barra_curto, z_f_ohm)
+
+        return copy.deepcopy(sep_ft)
 
     def criar_curto_fase_fase(self, id_barra_curto: int, z_f_ohm=0):
 
-        self.referenciar_sistema_no_curto(id_barra_curto, z_f_ohm)
+        sep_ff = copy.deepcopy(self)
 
-        self.calcular_corrente_curto_fase_terra()
+        sep_ff.referenciar_sistema_no_curto(id_barra_curto, z_f_ohm)
 
-        self.sep_seq_zero.corrente_curto = self.corrente_curto[0]
-        self.sep_seq_positiva.corrente_curto = self.corrente_curto[1]
-        self.sep_seq_negativa.corrente_curto = self.corrente_curto[2]
-        self.corrente_curto = self.corrente_curto[0] + self.corrente_curto[1] + self.corrente_curto[2]
+        sep_ff.calcular_corrente_curto_fase_fase()
 
-        self.criar_curto_assimetrico(id_barra_curto, z_f_ohm)
+        sep_ff.sep_seq_zero.corrente_curto = sep_ff.corrente_curto[0]
+        sep_ff.sep_seq_positiva.corrente_curto = sep_ff.corrente_curto[1]
+        sep_ff.sep_seq_negativa.corrente_curto = sep_ff.corrente_curto[2]
+        sep_ff.corrente_curto = sep_ff.corrente_curto[0] + sep_ff.corrente_curto[1] + sep_ff.corrente_curto[2]
 
-        return copy.deepcopy(self)
+        sep_ff.criar_curto_assimetrico(id_barra_curto, z_f_ohm)
+
+        return sep_ff
 
     def criar_curto_fase_fase_terra(self, id_barra_curto: int, z_f_ohm=0):
 
-        self.referenciar_sistema_no_curto(id_barra_curto, z_f_ohm)
+        sep_fft = copy.deepcopy(self)
+        
+        sep_fft.referenciar_sistema_no_curto(id_barra_curto, z_f_ohm)
 
-        self.calcular_corrente_curto_fase_fase_terra()
+        sep_fft.calcular_corrente_curto_fase_fase_terra()
 
-        self.sep_seq_zero.corrente_curto = self.corrente_curto[0]
-        self.sep_seq_positiva.corrente_curto = self.corrente_curto[1]
-        self.sep_seq_negativa.corrente_curto = self.corrente_curto[2]
-        self.corrente_curto = self.corrente_curto[0] + self.corrente_curto[1] + self.corrente_curto[2]
+        sep_fft.sep_seq_zero.corrente_curto = sep_fft.corrente_curto[0]
+        sep_fft.sep_seq_positiva.corrente_curto = sep_fft.corrente_curto[1]
+        sep_fft.sep_seq_negativa.corrente_curto = sep_fft.corrente_curto[2]
+        sep_fft.corrente_curto = sep_fft.corrente_curto[0] + sep_fft.corrente_curto[1] + sep_fft.corrente_curto[2]
 
-        self.criar_curto_assimetrico(id_barra_curto, z_f_ohm)
+        sep_fft.criar_curto_assimetrico(id_barra_curto, z_f_ohm)
 
-        return copy.deepcopy(self)
+        return sep_fft
 
+    def abrir_uma_fase(self, id_aberto_1: int, id_aberto_2: int):
+        
+        sep_1a = copy.deepcopy(self)
+        
+        sep_1a.is_umafase = True
+        sep_1a.id_aberto_1 = id_aberto_1
+        sep_1a.id_aberto_2 = id_aberto_2
+        sep_1a.sep_seq_positiva.id_aberto_1 = id_aberto_1
+        sep_1a.sep_seq_positiva.id_aberto_2 = id_aberto_2
+        sep_1a.sep_seq_negativa.id_aberto_1 = id_aberto_1
+        sep_1a.sep_seq_negativa.id_aberto_2 = id_aberto_2
+        sep_1a.sep_seq_zero.id_aberto_1 = id_aberto_1
+        sep_1a.sep_seq_zero.id_aberto_2 = id_aberto_2
+
+        sep_1a.referenciar_sistema_no_curto(id_aberto_1)
+
+        sep_1a.sep_seq_positiva.adicionar_tensoes_pre_falta(sep_1a.tensoes_to_menos_nref)
+        sep_1a.sep_seq_positiva.referenciar_sistema_no_curto(id_aberto_1)
+
+        sep_1a.sep_seq_negativa.adicionar_tensoes_pre_falta(sep_1a.tensoes_to_menos_nref * 0)
+        sep_1a.sep_seq_negativa.referenciar_sistema_no_curto(id_aberto_1)
+
+        sep_1a.sep_seq_zero.adicionar_tensoes_pre_falta(sep_1a.tensoes_to_menos_nref * 0)
+        sep_1a.sep_seq_zero.referenciar_sistema_no_curto(id_aberto_1)
+        sep_1a._calcular_zmn_aberto(id_aberto_1, id_aberto_2)
+
+        return sep_1a
+
+    def abrir_duas_fases(self, id_aberto_1: int, id_aberto_2: int):
+
+        sep_2a = copy.deepcopy(self)
+        
+        sep_2a.is_umafase = False
+        sep_2a.id_aberto_1 = id_aberto_1
+        sep_2a.id_aberto_2 = id_aberto_2
+        sep_2a.sep_seq_positiva.id_aberto_1 = id_aberto_1
+        sep_2a.sep_seq_positiva.id_aberto_2 = id_aberto_2
+        sep_2a.sep_seq_negativa.id_aberto_1 = id_aberto_1
+        sep_2a.sep_seq_negativa.id_aberto_2 = id_aberto_2
+        sep_2a.sep_seq_zero.id_aberto_1 = id_aberto_1
+        sep_2a.sep_seq_zero.id_aberto_2 = id_aberto_2
+
+        sep_2a.referenciar_sistema_no_curto(id_aberto_1)
+
+        sep_2a.sep_seq_positiva.adicionar_tensoes_pre_falta(sep_2a.tensoes_to_menos_nref)
+        sep_2a.sep_seq_positiva.referenciar_sistema_no_curto(id_aberto_1)
+
+        sep_2a.sep_seq_negativa.adicionar_tensoes_pre_falta(sep_2a.tensoes_to_menos_nref * 0)
+        sep_2a.sep_seq_negativa.referenciar_sistema_no_curto(id_aberto_1)
+
+        sep_2a.sep_seq_zero.adicionar_tensoes_pre_falta(sep_2a.tensoes_to_menos_nref * 0)
+        sep_2a.sep_seq_zero.referenciar_sistema_no_curto(id_aberto_1)
+
+        sep_2a._calcular_zmn_aberto(id_aberto_1, id_aberto_2)
+
+        return sep_2a
+
+
+    def _calcular_zmn_aberto(self, id_aberto_1: int, id_aberto_2: int):
+        Z_LT_mn_0 = 1 / (self.sep_seq_zero.matriz_admitancias[id_aberto_1 - 1][id_aberto_2 - 1])
+        Z_LT_mn_1 = 1 / (self.sep_seq_positiva.matriz_admitancias[id_aberto_1 - 1][id_aberto_2 - 1])
+        Z_LT_mn_2 = 1 / (self.sep_seq_negativa.matriz_admitancias[id_aberto_1 - 1][id_aberto_2 - 1])
+
+        Z_TH_mn_0 = (self.sep_seq_zero.matriz_impedacias[id_aberto_1 - 1][id_aberto_1 - 1] +
+                     self.sep_seq_zero.matriz_impedacias[id_aberto_2 - 1][id_aberto_2 - 1] -
+                     2 * self.sep_seq_zero.matriz_impedacias[id_aberto_1 - 1][id_aberto_2 - 1])
+        Z_TH_mn_1 = (self.sep_seq_positiva.matriz_impedacias[id_aberto_1 - 1][id_aberto_1 - 1] +
+                     self.sep_seq_positiva.matriz_impedacias[id_aberto_2 - 1][id_aberto_2 - 1] -
+                     2 * self.sep_seq_positiva.matriz_impedacias[id_aberto_1 - 1][id_aberto_2 - 1])
+        Z_TH_mn_2 = (self.sep_seq_negativa.matriz_impedacias[id_aberto_1 - 1][id_aberto_1 - 1] +
+                     self.sep_seq_negativa.matriz_impedacias[id_aberto_2 - 1][id_aberto_2 - 1] -
+                     2 * self.sep_seq_negativa.matriz_impedacias[id_aberto_1 - 1][id_aberto_2 - 1])
+
+        self.Z_mn_0 = -((Z_LT_mn_0)**2/(Z_TH_mn_0-Z_LT_mn_0))
+        self.Z_mn_1 = -((Z_LT_mn_1) ** 2 / (Z_TH_mn_1 - Z_LT_mn_1))
+        self.Z_mn_2 = -((Z_LT_mn_2) ** 2 / (Z_TH_mn_2 - Z_LT_mn_2))
+
+        self.I_mn_to_mais = (self.tensoes_to_menos[id_aberto_1 - 1] - self.tensoes_to_menos[id_aberto_2 - 1]) / Z_LT_mn_1
+        
+        if self.is_umafase:
+            self._tensoes_assimetricas_uma_fase()
+        else:
+            self._tensoes_assimetricas_duas_fases()
+        
+        self.I_m_0 = -self.Va_0 / Z_LT_mn_0
+        self.I_n_0 = self.Va_0 / Z_LT_mn_0
+        self.I_m_1 = -self.Va_1 / Z_LT_mn_1
+        self.I_n_1 = self.Va_1 / Z_LT_mn_1
+        self.I_m_2 = -self.Va_2 / Z_LT_mn_2
+        self.I_n_2 = self.Va_2 / Z_LT_mn_2
+
+        matriz_corrente_curto_0 = np.zeros((self.quantidade_barras, 1), dtype=complex)
+        matriz_corrente_curto_0[id_aberto_1 - 1][0] = -self.I_m_0
+        matriz_corrente_curto_0[id_aberto_2][0] = -self.I_n_0
+
+        matriz_corrente_curto_1 = np.zeros((self.quantidade_barras, 1), dtype=complex)
+        matriz_corrente_curto_1[id_aberto_1 - 1][0] = -self.I_m_1
+        matriz_corrente_curto_1[id_aberto_2 - 1][0] = -self.I_n_1
+
+        matriz_corrente_curto_2 = np.zeros((self.quantidade_barras, 1), dtype=complex)
+        matriz_corrente_curto_2[id_aberto_1 - 1][0] = -self.I_m_2
+        matriz_corrente_curto_2[id_aberto_2 - 1][0] = -self.I_n_2
+
+        self.sep_seq_zero.tensoes_to_mais = np.matmul(self.sep_seq_zero.matriz_impedacias,
+                                                                              matriz_corrente_curto_0)
+        self.sep_seq_positiva.tensoes_to_mais = self.tensoes_to_menos+np.matmul(self.sep_seq_positiva.matriz_impedacias,
+                                                                              matriz_corrente_curto_1)
+        self.sep_seq_negativa.tensoes_to_mais= np.matmul(self.sep_seq_negativa.matriz_impedacias,
+                                                                              matriz_corrente_curto_2)
+
+        for sep in [self.sep_seq_zero, self.sep_seq_positiva, self.sep_seq_negativa]:
+            for index, barra in enumerate(sep.barras[1:]):
+                barra.v_barra_pos_falta_pu = sep.tensoes_to_mais[index]
+
+                if sep is SEP_negativo:
+                    barra.calcular_tensoes_pos_falta_assimetricas(0, 0, barra.v_barra_pos_falta_pu_gv)
+                elif sep is SEP_0:
+                    barra.calcular_tensoes_pos_falta_assimetricas(barra.v_barra_pos_falta_pu_gv, 0, 0)
+                else:
+                    barra.calcular_tensoes_pos_falta_assimetricas(0, barra.v_barra_pos_falta_pu_gv, 0)
+        barra_terra: Barra = self.barras[0]
+        barra_terra.v_barra_pos_falta_pu = 0
+
+        self.atribuir_tensoes_pos_falta_assimetricas()
+
+        
+    def _tensoes_assimetricas_uma_fase(self):
+        I_1 = (self.I_mn_to_mais *
+               (self.Z_mn_1 / (self.Z_mn_1 + ((self.Z_mn_0 * self.Z_mn_2)/(self.Z_mn_0 +self.Z_mn_2)))))
+        self.Va_0 = I_1 * ((self.Z_mn_0 * self.Z_mn_2)/(self.Z_mn_0 +self.Z_mn_2))
+        self.Va_1 = self.Va_0
+        self.Va_2 = self.Va_0
+
+    def _tensoes_assimetricas_duas_fases(self):
+        I_1 = (self.I_mn_to_mais *
+               (self.Z_mn_1 / (self.Z_mn_1 + self.Z_mn_2 + self.Z_mn_0)))
+
+        self.Va_0 = -I_1 * ((self.Z_mn_0))
+        self.Va_1 = I_1 * ((self.Z_mn_0 + self.Z_mn_2))
+        self.Va_2 = -I_1 * ((self.Z_mn_2))
+        
+    
 
     def criar_curto_assimetrico(self, id_barra_curto: int, z_f_ohm=0):
         self.sep_seq_positiva.adicionar_tensoes_pre_falta(self.tensoes_to_menos_nref)
@@ -507,7 +655,7 @@ class SEP:
             v_barra_positiva = self.sep_seq_positiva.barras[index].Va_pu
             v_barra_negativa = self.sep_seq_negativa.barras[index].Va_pu
             v_barra_zero= self.sep_seq_zero.barras[index].Va_pu
-            barra.calcular_tensoes_pos_falta_assimetricas(0, v_barra_positiva, v_barra_negativa)
+            barra.calcular_tensoes_pos_falta_assimetricas(v_barra_zero, v_barra_positiva, v_barra_negativa)
 
     def atribuir_correntes_pos_falta_assimetricas(self):
         for index, elemento in enumerate(self.elementos):
@@ -535,7 +683,8 @@ class SEP_positivo(SEP):
 
     def alterar_v_base_p_monofasico(self):
         for barra in self.barras:
-            barra.v_base = barra.v_base/sqrt(3)
+            # barra.v_base = barra.v_base/sqrt(3)
+            pass
 
 
 class SEP_negativo(SEP):
@@ -562,7 +711,8 @@ class SEP_negativo(SEP):
 
     def alterar_v_base_p_monofasico(self):
         for barra in self.barras:
-            barra.v_base = barra.v_base/sqrt(3)
+            # barra.v_base = barra.v_base/sqrt(3)
+            pass
 
 class SEP_0(SEP):
 
@@ -595,4 +745,5 @@ class SEP_0(SEP):
 
     def alterar_v_base_p_monofasico(self):
         for barra in self.barras:
-            barra.v_base = barra.v_base/sqrt(3)
+            # barra.v_base = barra.v_base/sqrt(3)
+            pass
