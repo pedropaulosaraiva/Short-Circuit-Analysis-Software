@@ -321,3 +321,476 @@ class Interface_latex(Iresultados):
                     str_tabela.append("%4.4f" % column)
 
             f.write(tabela_2.format(*str_tabela))
+
+class Interface_latex_assi:
+
+    def __init__(self, sep_curto_ft_7: SEP, sep_curto_ff_2: SEP, sep_curto_fft_9: SEP, sep_aberto_f_45: SEP,
+                 sep_aberto_ff_47: SEP):
+
+        self.sep_curto_ft_7 = sep_curto_ft_7
+        self.sep_curto_ff_2 = sep_curto_ff_2
+        self.sep_curto_ftt_9 = sep_curto_fft_9
+        self.sep_aberto_f_45 = sep_aberto_f_45
+        self.sep_aberto_ff_47 = sep_aberto_ff_47
+        self.lista_seps = [sep_curto_ft_7, sep_curto_ff_2, sep_curto_fft_9, sep_aberto_f_45, sep_aberto_ff_47]
+        self.lista_i = [sep_curto_ft_7, sep_curto_ff_2, sep_curto_fft_9]
+
+    def matriz_barras_a(self, indx_1, indx_2):
+        V_barras = np.zeros((30, (indx_2 - indx_1) * 2), dtype=float)
+        for n, sep in enumerate(self.lista_seps):
+            barras = sep.barras
+            indx = 0
+            for barra in barras[indx_1:indx_2]:
+                # Pu
+
+                V_barras[6 * n + 0][indx] = barra.Va_pu[0]
+                V_barras[6 * n + 0][indx + 1] = barra.Va_pu[1]
+
+                V_barras[6 * n + 1][indx] = barra.Vb_pu[0]
+                V_barras[6 * n + 1][indx + 1] = barra.Vb_pu[1]
+
+                V_barras[6 * n + 2][indx] = barra.Vc_pu[0]
+                V_barras[6 * n + 2][indx + 1] = barra.Vc_pu[1]
+
+                # Si
+                V_barras[6 * n + 3][indx] = barra.Va_volts[0] / 1000
+                V_barras[6 * n + 3][indx + 1] = barra.Va_volts[1]
+
+                V_barras[6 * n + 4][indx] = barra.Vb_volts[0] / 1000
+                V_barras[6 * n + 4][indx + 1] = barra.Vb_volts[1]
+
+                V_barras[6 * n + 5][indx] = barra.Vc_volts[0] / 1000
+                V_barras[6 * n + 5][indx + 1] = barra.Vc_volts[1]
+
+                indx = indx + 2
+        return V_barras
+
+    def matriz_barras_123(self, indx_1, indx_2):
+        V_barras = np.zeros((30, (indx_2 - indx_1) * 2), dtype=float)
+        for n, sep in enumerate(self.lista_seps):
+            sep_zero = sep.sep_seq_zero
+            sep_positivo = sep.sep_seq_positiva
+            sep_negativo = sep.sep_seq_negativa
+            barras = sep.barras
+            indx = 0
+            for index, barra in enumerate(barras[indx_1:indx_2], start=indx_1):
+                # Pu
+                barra_z = sep_zero.barras[index]
+                barra_p = sep_positivo.barras[index]
+                barra_n = sep_negativo.barras[index]
+                
+                V_barras[6 * n + 0][indx] = barra_z.Va_pu[0]
+                V_barras[6 * n + 0][indx + 1] = barra_z.Va_pu[1]
+
+                V_barras[6 * n + 1][indx] = barra_p.Va_pu[0]
+                V_barras[6 * n + 1][indx + 1] = barra_p.Va_pu[1]
+
+                V_barras[6 * n + 2][indx] = barra_n.Va_pu[0]
+                V_barras[6 * n + 2][indx + 1] = barra_n.Va_pu[1]
+
+                # Si
+                V_barras[6 * n + 3][indx] = barra_z.Va_volts[0] / 1000
+                V_barras[6 * n + 3][indx + 1] = barra_z.Va_volts[1]
+
+                V_barras[6 * n + 4][indx] = barra_p.Va_volts[0] / 1000
+                V_barras[6 * n + 4][indx + 1] = barra_p.Va_volts[1]
+
+                V_barras[6 * n + 5][indx] = barra_n.Va_volts[0] / 1000
+                V_barras[6 * n + 5][indx + 1] = barra_n.Va_volts[1]
+
+                indx = indx + 2
+        return V_barras
+
+    def matriz_barras(self):
+        b1_3 = self.matriz_barras_a(1, 4)
+        b4_6 = self.matriz_barras_a(4, 7)
+        b7_9 = self.matriz_barras_a(7, 10)
+
+        for index, b in enumerate([b1_3, b4_6, b7_9]):
+            with open(f'tabela_barras_abc{index}.txt', 'w') as f:
+
+                tabela_2 = """    \\multirow{{6}}{{*}}{{1a) i}} & \\multirow{{3}}{{*}}{{PU}}& A & {}             & {}           & {}          & {}& {}& {} \\\\\n
+                &                        & B & {}             & {}           & {}           & {}& {}& {} \\\\\n
+                &                        & C & {}             & {}           & {}           & {}& {}& {} \\\\\\cline{{2-9}}\n
+                & \\multirow{{3}}{{*}}{{SI ($kV$)}}& A & {}             & {}           & {}           & {}& {}& {} \\\\\n
+                &                        & B & {}             & {}           & {}           & {}& {}& {} \\\\\n
+                &                        & C & {}             & {}           & {}           & {}& {}& {} \\\\\\cline{{1-9}}\n
+                \\multirow{{6}}{{*}}{{1a) ii}} & \\multirow{{3}}{{*}}{{PU}}& A & {}             & {}           & {}        & {}& {}& {} \\\\\n
+                &                        & B & {}             & {}           & {}           & {}& {}& {} \\\\\n
+                &                        & C & {}             & {}           & {}           & {}& {}& {} \\\\\\cline{{2-9}}\n
+                & \\multirow{{3}}{{*}}{{SI ($kV$)}}& A & {}             & {}           & {}           & {}& {}& {} \\\\\n
+                &                        & B & {}             & {}           & {}           & {}& {}& {} \\\\\n
+                &                        & C & {}             & {}           & {}           & {}& {}& {} \\\\\\cline{{1-9}}\n
+                \\multirow{{6}}{{*}}{{1a) iii}} & \\multirow{{3}}{{*}}{{PU}}& A & {}             & {}           & {}        & {}& {}& {} \\\\\n
+                &                        & B & {}             & {}           & {}           & {}& {}& {} \\\\\n
+                &                        & C & {}             & {}           & {}           & {}& {}& {} \\\\\\cline{{2-9}}\n
+                & \\multirow{{3}}{{*}}{{SI ($kV$)}}& A & {}             & {}           & {}           & {}& {}& {} \\\\\n
+                &                        & B & {}             & {}           & {}           & {}& {}& {} \\\\\n
+                &                        & C & {}             & {}           & {}           & {}& {}& {} \\\\\\cline{{1-9}}\n
+                \\multirow{{6}}{{*}}{{1b) i}} & \\multirow{{3}}{{*}}{{PU}}& A & {}             & {}           & {}        & {}& {}& {} \\\\\n
+                &                        & B & {}             & {}           & {}           & {}& {}& {} \\\\\n
+                &                        & C & {}             & {}           & {}           & {}& {}& {} \\\\\\cline{{2-9}}\n
+                & \\multirow{{3}}{{*}}{{SI ($kV$)}}& A & {}             & {}           & {}           & {}& {}& {} \\\\\n
+                &                        & B & {}             & {}           & {}           & {}& {}& {} \\\\\n
+                &                        & C & {}             & {}           & {}           & {}& {}& {} \\\\\\cline{{1-9}}\n
+                \\multirow{{6}}{{*}}{{1b) ii}} & \\multirow{{3}}{{*}}{{PU}}& A & {}             & {}           & {}        & {}& {}& {} \\\\\n
+                &                        & B & {}             & {}           & {}           & {}& {}& {} \\\\\n
+                &                        & C & {}             & {}           & {}           & {}& {}& {} \\\\\\cline{{2-9}}\n
+                & \\multirow{{3}}{{*}}{{SI ($kV$)}}& A & {}             & {}           & {}           & {}& {}& {} \\\\\n
+                &                        & B & {}             & {}           & {}           & {}& {}& {} \\\\\n
+                &                        & C & {}             & {}           & {}           & {}& {}& {} \\\\\\cline{{1-9}}\n"""
+                str_tabela = []
+                for row in b:
+                    for column in row:
+                        str_tabela.append("%4.4f" % column)
+
+                f.write(tabela_2.format(*str_tabela))
+                
+    def matriz_barras_seq(self):
+        b1_3 = self.matriz_barras_123(1, 4)
+        b4_6 = self.matriz_barras_123(4, 7)
+        b7_9 = self.matriz_barras_123(7, 10)
+
+        for index, b in enumerate([b1_3, b4_6, b7_9]):
+            with open(f'tabela_barras_123{index}.txt', 'w') as f:
+
+                tabela_2 = """    \\multirow{{6}}{{*}}{{1a) i}} & \\multirow{{3}}{{*}}{{PU}}& (0) & {}             & {}           & {}          & {}& {}& {} \\\\\n
+                &                        & (1) & {}             & {}           & {}           & {}& {}& {} \\\\\n
+                &                        & (2) & {}             & {}           & {}           & {}& {}& {} \\\\\\cline{{2-9}}\n
+                & \\multirow{{3}}{{*}}{{SI ($kV$)}}& (0) & {}             & {}           & {}           & {}& {}& {} \\\\\n
+                &                        & (1) & {}             & {}           & {}           & {}& {}& {} \\\\\n
+                &                        & (2) & {}             & {}           & {}           & {}& {}& {} \\\\\\cline{{1-9}}\n
+                \\multirow{{6}}{{*}}{{1a) ii}} & \\multirow{{3}}{{*}}{{PU}}& (0) & {}             & {}           & {}        & {}& {}& {} \\\\\n
+                &                        & (1) & {}             & {}           & {}           & {}& {}& {} \\\\\n
+                &                        & (2) & {}             & {}           & {}           & {}& {}& {} \\\\\\cline{{2-9}}\n
+                & \\multirow{{3}}{{*}}{{SI ($kV$)}}& (0) & {}             & {}           & {}           & {}& {}& {} \\\\\n
+                &                        & (1) & {}             & {}           & {}           & {}& {}& {} \\\\\n
+                &                        & (2) & {}             & {}           & {}           & {}& {}& {} \\\\\\cline{{1-9}}\n
+                \\multirow{{6}}{{*}}{{1a) iii}} & \\multirow{{3}}{{*}}{{PU}}& (0) & {}             & {}           & {}        & {}& {}& {} \\\\\n
+                &                        & (1) & {}             & {}           & {}           & {}& {}& {} \\\\\n
+                &                        & (2) & {}             & {}           & {}           & {}& {}& {} \\\\\\cline{{2-9}}\n
+                & \\multirow{{3}}{{*}}{{SI ($kV$)}}& (0) & {}             & {}           & {}           & {}& {}& {} \\\\\n
+                &                        & (1) & {}             & {}           & {}           & {}& {}& {} \\\\\n
+                &                        & (2) & {}             & {}           & {}           & {}& {}& {} \\\\\\cline{{1-9}}\n
+                \\multirow{{6}}{{*}}{{1b) i}} & \\multirow{{3}}{{*}}{{PU}}& (0) & {}             & {}           & {}        & {}& {}& {} \\\\\n
+                &                        & (1) & {}             & {}           & {}           & {}& {}& {} \\\\\n
+                &                        & (2) & {}             & {}           & {}           & {}& {}& {} \\\\\\cline{{2-9}}\n
+                & \\multirow{{3}}{{*}}{{SI ($kV$)}}& (0) & {}             & {}           & {}           & {}& {}& {} \\\\\n
+                &                        & (1) & {}             & {}           & {}           & {}& {}& {} \\\\\n
+                &                        & (2) & {}             & {}           & {}           & {}& {}& {} \\\\\\cline{{1-9}}\n
+                \\multirow{{6}}{{*}}{{1b) ii}} & \\multirow{{3}}{{*}}{{PU}}& (0) & {}             & {}           & {}        & {}& {}& {} \\\\\n
+                &                        & (1) & {}             & {}           & {}           & {}& {}& {} \\\\\n
+                &                        & (2) & {}             & {}           & {}           & {}& {}& {} \\\\\\cline{{2-9}}\n
+                & \\multirow{{3}}{{*}}{{SI ($kV$)}}& (0) & {}             & {}           & {}           & {}& {}& {} \\\\\n
+                &                        & (1) & {}             & {}           & {}           & {}& {}& {} \\\\\n
+                &                        & (2) & {}             & {}           & {}           & {}& {}& {} \\\\\\cline{{1-9}}\n"""
+                str_tabela = []
+                for row in b:
+                    for column in row:
+                        str_tabela.append("%4.4f" % column)
+
+                f.write(tabela_2.format(*str_tabela))
+
+    def matriz_elementos(self, indx_1, indx_2):
+        I_elementos = np.zeros((18, (indx_2 - indx_1) * 2), dtype=float)
+        for n, sep in enumerate([self.sep, self.sep_4, self.sep_8]):
+            elementos = sep.elementos
+            indx = 0
+            for elemento in elementos[indx_1:indx_2]:
+                # Pu
+
+                I_elementos[6 * n + 0][indx] = elemento.Ia_pu[0]
+                I_elementos[6 * n + 0][indx + 1] = elemento.Ia_pu[1]
+
+                I_elementos[6 * n + 1][indx] = elemento.Ib_pu[0]
+                I_elementos[6 * n + 1][indx + 1] = elemento.Ib_pu[1]
+
+                I_elementos[6 * n + 2][indx] = elemento.Ic_pu[0]
+                I_elementos[6 * n + 2][indx + 1] = elemento.Ic_pu[1]
+
+                # Si
+                I_elementos[6 * n + 3][indx] = elemento.Ia_amp[0]
+                I_elementos[6 * n + 3][indx + 1] = elemento.Ia_amp[1]
+
+                I_elementos[6 * n + 4][indx] = elemento.Ib_amp[0]
+                I_elementos[6 * n + 4][indx + 1] = elemento.Ib_amp[1]
+
+                I_elementos[6 * n + 5][indx] = elemento.Ic_amp[0]
+                I_elementos[6 * n + 5][indx + 1] = elemento.Ic_amp[1]
+
+                indx = indx + 2
+        return I_elementos
+
+    def matriz_elementos_v_2(self, indx_1, indx_2):
+        I_elementos = np.zeros((18, 4), dtype=float)
+        for n, sep in enumerate(self.lista_i):
+            elementos = sep.elementos
+            indx = 0
+            for elemento in [elementos[indx_1], elementos[indx_2]]:
+                # Pu
+
+                I_elementos[6 * n + 0][indx] = elemento.Ia_pu[0]
+                I_elementos[6 * n + 0][indx + 1] = elemento.Ia_pu[1]
+
+                I_elementos[6 * n + 1][indx] = elemento.Ib_pu[0]
+                I_elementos[6 * n + 1][indx + 1] = elemento.Ib_pu[1]
+
+                I_elementos[6 * n + 2][indx] = elemento.Ic_pu[0]
+                I_elementos[6 * n + 2][indx + 1] = elemento.Ic_pu[1]
+
+                # Si
+                I_elementos[6 * n + 3][indx] = elemento.Ia_amp[0]
+                I_elementos[6 * n + 3][indx + 1] = elemento.Ia_amp[1]
+
+                I_elementos[6 * n + 4][indx] = elemento.Ib_amp[0]
+                I_elementos[6 * n + 4][indx + 1] = elemento.Ib_amp[1]
+
+                I_elementos[6 * n + 5][indx] = elemento.Ic_amp[0]
+                I_elementos[6 * n + 5][indx + 1] = elemento.Ic_amp[1]
+
+                indx = indx + 2
+        return I_elementos
+    
+    def matriz_elementos_v_2_seq(self, indx_1, indx_2):
+        I_elementos = np.zeros((18, 4), dtype=float)
+        for n, sep in enumerate(self.lista_i):
+            sep_zero = sep.sep_seq_zero
+            sep_positivo = sep.sep_seq_positiva
+            sep_negativo = sep.sep_seq_negativa
+            indx = 0
+            for index_ele in [indx_1, indx_2]:
+                # Pu
+
+                elemento_z = sep_zero.elementos[index_ele]
+                elemento_p = sep_positivo.elementos[index_ele]
+                elemento_n = sep_negativo.elementos[index_ele]
+                
+                I_elementos[6 * n + 0][indx] = elemento_z.Ia_pu[0]
+                I_elementos[6 * n + 0][indx + 1] = elemento_z.Ia_pu[1]
+
+                I_elementos[6 * n + 1][indx] = elemento_p.Ia_pu[0]
+                I_elementos[6 * n + 1][indx + 1] = elemento_p.Ia_pu[1]
+
+                I_elementos[6 * n + 2][indx] = elemento_n.Ia_pu[0]
+                I_elementos[6 * n + 2][indx + 1] = elemento_n.Ia_pu[1]
+
+                # Si
+                I_elementos[6 * n + 3][indx] = elemento_z.Ia_amp[0]
+                I_elementos[6 * n + 3][indx + 1] = elemento_z.Ia_amp[1]
+
+                I_elementos[6 * n + 4][indx] = elemento_p.Ia_amp[0]
+                I_elementos[6 * n + 4][indx + 1] = elemento_p.Ia_amp[1]
+
+                I_elementos[6 * n + 5][indx] = elemento_n.Ia_amp[0]
+                I_elementos[6 * n + 5][indx + 1] = elemento_n.Ia_amp[1]
+
+                indx = indx + 2
+                indx_1 = indx_2
+        return I_elementos
+
+    def salvar_matriz_barras_latex(self, idx_1, idx_2):
+        B = self.matriz_barras_a(idx_1, idx_2)
+        np.savetxt('matriz_barras.csv', B, delimiter=' & ', fmt='%4.4f', newline=' \\\\\n')
+
+    def salvar_matriz_elementos_latex_012(self):
+        ele2_1 = self.matriz_elementos_v_2_seq(1, 2)
+        ele2_2 = self.matriz_elementos_v_2_seq(3, 4)
+        ele7_1 = self.matriz_elementos_v_2_seq(7, 8)
+        ele7_2 = self.matriz_elementos_v_2_seq(10, 13)
+
+        for index, b in enumerate([ele2_1, ele2_2, ele7_1, ele7_2]):
+            with open(f'tabela_elementos_SEQ{index}.txt', 'w') as f:
+
+                tabela_2 = """    \\multirow{{6}}{{*}}{{1a) i}} & \\multirow{{3}}{{*}}{{PU}}& (0) & {}             & {}           & {}          & {} \\\\\n
+                        &                        & (1) & {}             & {}           & {}           & {} \\\\\n
+                        &                        & (2) & {}             & {}           & {}           & {} \\\\\\cline{{2-7}}\n
+                        & \\multirow{{3}}{{*}}{{SI ($A$)}}& (0) & {}             & {}           & {}           & {} \\\\\n
+                        &                        & (1) & {}             & {}           & {}           & {} \\\\\n
+                        &                        & (2) & {}             & {}           & {}           & {} \\\\\\cline{{1-7}}\n
+                        \\multirow{{6}}{{*}}{{1a) ii}} & \\multirow{{3}}{{*}}{{PU}}& (0) & {}             & {}           & {}        & {} \\\\\n
+                        &                        & (1) & {}             & {}           & {}           & {} \\\\\n
+                        &                        & (2) & {}             & {}           & {}           & {} \\\\\\cline{{2-7}}\n
+                        & \\multirow{{3}}{{*}}{{SI ($A$)}}& (0) & {}             & {}           & {}           & {} \\\\\n
+                        &                        & (1) & {}             & {}           & {}           & {} \\\\\n
+                        &                        & (2) & {}             & {}           & {}           & {} \\\\\\cline{{1-7}}\n
+                        \\multirow{{6}}{{*}}{{1a) iii}} & \\multirow{{3}}{{*}}{{PU}}& (0) & {}             & {}           & {}        & {} \\\\\n
+                        &                        & (1) & {}             & {}           & {}           & {} \\\\\n
+                        &                        & (2) & {}             & {}           & {}           & {} \\\\\\cline{{2-7}}\n
+                        & \\multirow{{3}}{{*}}{{SI ($A$)}}& (0) & {}             & {}           & {}           & {} \\\\\n
+                        &                        & (1) & {}             & {}           & {}           & {} \\\\\n
+                        &                        & (2) & {}             & {}           & {}           & {} \\\\\\cline{{1-7}}\n
+                        """
+                str_tabela = []
+                for row in b:
+                    for column in row:
+                        str_tabela.append("%4.4f" % column)
+
+                f.write(tabela_2.format(*str_tabela))
+
+    def salvar_matriz_elementos_latex_ABC(self):
+        ele2_1 = self.matriz_elementos_v_2(1, 2)
+        ele2_2 = self.matriz_elementos_v_2(3, 4)
+        ele7_1 = self.matriz_elementos_v_2(7, 8)
+        ele7_2 = self.matriz_elementos_v_2(10, 13)
+
+        for index, b in enumerate([ele2_1, ele2_2, ele7_1, ele7_2]):
+            with open(f'tabela_elementos_ABC{index}.txt', 'w') as f:
+
+                tabela_2 ="""    \\multirow{{6}}{{*}}{{1a) i}} & \\multirow{{3}}{{*}}{{PU}}& A & {}             & {}           & {}          & {} \\\\\n
+            &                        & B & {}             & {}           & {}           & {} \\\\\n
+            &                        & C & {}             & {}           & {}           & {} \\\\\\cline{{2-7}}\n
+            & \\multirow{{3}}{{*}}{{SI ($A$)}}& A & {}             & {}           & {}           & {} \\\\\n
+            &                        & B & {}             & {}           & {}           & {} \\\\\n
+            &                        & C & {}             & {}           & {}           & {} \\\\\\cline{{1-7}}\n
+            \\multirow{{6}}{{*}}{{1a) ii}} & \\multirow{{3}}{{*}}{{PU}}& A & {}             & {}           & {}        & {} \\\\\n
+            &                        & B & {}             & {}           & {}           & {} \\\\\n
+            &                        & C & {}             & {}           & {}           & {} \\\\\\cline{{2-7}}\n
+            & \\multirow{{3}}{{*}}{{SI ($A$)}}& A & {}             & {}           & {}           & {} \\\\\n
+            &                        & B & {}             & {}           & {}           & {} \\\\\n
+            &                        & C & {}             & {}           & {}           & {} \\\\\\cline{{1-7}}\n
+            \\multirow{{6}}{{*}}{{1a) iii}} & \\multirow{{3}}{{*}}{{PU}}& A & {}             & {}           & {}        & {} \\\\\n
+            &                        & B & {}             & {}           & {}           & {} \\\\\n
+            &                        & C & {}             & {}           & {}           & {} \\\\\\cline{{2-7}}\n
+            & \\multirow{{3}}{{*}}{{SI ($A$)}}& A & {}             & {}           & {}           & {} \\\\\n
+            &                        & B & {}             & {}           & {}           & {} \\\\\n
+            &                        & C & {}             & {}           & {}           & {} \\\\\\cline{{1-7}}\n
+            """
+                str_tabela = []
+                for row in b:
+                    for column in row:
+                        str_tabela.append("%4.4f" % column)
+
+                f.write(tabela_2.format(*str_tabela))
+
+    def matriz_elementos_v_2_single(self, indx_1):
+        I_elementos = np.zeros((18, 2), dtype=float)
+        for n, sep in enumerate(self.lista_i):
+            elementos = sep.elementos
+            indx = 0
+            for elemento in [elementos[indx_1]]:
+                # Pu
+
+                I_elementos[6 * n + 0][indx] = elemento.Ia_pu[0]
+                I_elementos[6 * n + 0][indx + 1] = elemento.Ia_pu[1]
+
+                I_elementos[6 * n + 1][indx] = elemento.Ib_pu[0]
+                I_elementos[6 * n + 1][indx + 1] = elemento.Ib_pu[1]
+
+                I_elementos[6 * n + 2][indx] = elemento.Ic_pu[0]
+                I_elementos[6 * n + 2][indx + 1] = elemento.Ic_pu[1]
+
+                # Si
+                I_elementos[6 * n + 3][indx] = elemento.Ia_amp[0]
+                I_elementos[6 * n + 3][indx + 1] = elemento.Ia_amp[1]
+
+                I_elementos[6 * n + 4][indx] = elemento.Ib_amp[0]
+                I_elementos[6 * n + 4][indx + 1] = elemento.Ib_amp[1]
+
+                I_elementos[6 * n + 5][indx] = elemento.Ic_amp[0]
+                I_elementos[6 * n + 5][indx + 1] = elemento.Ic_amp[1]
+
+                indx = indx + 2
+        return I_elementos
+
+    def matriz_elementos_v_2_seq_single(self, indx_1):
+        I_elementos = np.zeros((18, 2), dtype=float)
+        for n, sep in enumerate(self.lista_i):
+            sep_zero = sep.sep_seq_zero
+            sep_positivo = sep.sep_seq_positiva
+            sep_negativo = sep.sep_seq_negativa
+            indx = 0
+            for index_ele in [indx_1]:
+                # Pu
+
+                elemento_z = sep_zero.elementos[index_ele]
+                elemento_p = sep_positivo.elementos[index_ele]
+                elemento_n = sep_negativo.elementos[index_ele]
+
+                I_elementos[6 * n + 0][indx] = elemento_z.Ia_pu[0]
+                I_elementos[6 * n + 0][indx + 1] = elemento_z.Ia_pu[1]
+
+                I_elementos[6 * n + 1][indx] = elemento_p.Ia_pu[0]
+                I_elementos[6 * n + 1][indx + 1] = elemento_p.Ia_pu[1]
+
+                I_elementos[6 * n + 2][indx] = elemento_n.Ia_pu[0]
+                I_elementos[6 * n + 2][indx + 1] = elemento_n.Ia_pu[1]
+
+                # Si
+                I_elementos[6 * n + 3][indx] = elemento_z.Ia_amp[0]
+                I_elementos[6 * n + 3][indx + 1] = elemento_z.Ia_amp[1]
+
+                I_elementos[6 * n + 4][indx] = elemento_p.Ia_amp[0]
+                I_elementos[6 * n + 4][indx + 1] = elemento_p.Ia_amp[1]
+
+                I_elementos[6 * n + 5][indx] = elemento_n.Ia_amp[0]
+                I_elementos[6 * n + 5][indx + 1] = elemento_n.Ia_amp[1]
+
+                indx = indx + 2
+                
+        return I_elementos
+
+    def salvar_matriz_elementos_latex_012_single(self):
+        ele9_1 = self.matriz_elementos_v_2_seq_single(14)
+        
+
+        for index, b in enumerate([ele9_1]):
+            with open(f'tabela_elementos_SEQ_single{index}.txt', 'w') as f:
+
+                tabela_2 = """    \\multirow{{6}}{{*}}{{1a) i}} & \\multirow{{3}}{{*}}{{PU}}& (0) & {}     & {}        \\\\\n
+                        &                        & (1) & {}             & {}           \\\\\n
+                        &                        & (2) & {}             & {}           \\\\\\cline{{2-5}}\n
+                        & \\multirow{{3}}{{*}}{{SI ($A$)}}& (0) & {}             & {}           \\\\\n
+                        &                        & (1) & {}             & {}           \\\\\n
+                        &                        & (2) & {}             & {}           \\\\\\cline{{1-5}}\n
+                        \\multirow{{6}}{{*}}{{1a) ii}} & \\multirow{{3}}{{*}}{{PU}}& (0) & {}    & {}         \\\\\n
+                        &                        & (1) & {}             & {}           \\\\\n
+                        &                        & (2) & {}             & {}           \\\\\\cline{{2-5}}\n
+                        & \\multirow{{3}}{{*}}{{SI ($A$)}}& (0) & {}             & {}           \\\\\n
+                        &                        & (1) & {}             & {}           \\\\\n
+                        &                        & (2) & {}             & {}           \\\\\\cline{{1-5}}\n
+                        \\multirow{{6}}{{*}}{{1a) iii}} & \\multirow{{3}}{{*}}{{PU}}& (0) & {}    & {}         \\\\\n
+                        &                        & (1) & {}             & {}           \\\\\n
+                        &                        & (2) & {}             & {}           \\\\\\cline{{2-5}}\n
+                        & \\multirow{{3}}{{*}}{{SI ($A$)}}& (0) & {}             & {}           \\\\\n
+                        &                        & (1) & {}             & {}           \\\\\n
+                        &                        & (2) & {}             & {}           \\\\\\cline{{1-5}}\n
+                        """
+                str_tabela = []
+                for row in b:
+                    for column in row:
+                        str_tabela.append("%4.4f" % column)
+
+                f.write(tabela_2.format(*str_tabela))
+
+    def salvar_matriz_elementos_latex_ABC_single(self):
+        ele9_1 = self.matriz_elementos_v_2_single(14)
+        
+
+        for index, b in enumerate([ele9_1]):
+            with open(f'tabela_elementos_ABC_single{index}.txt', 'w') as f:
+
+                tabela_2 = """    \\multirow{{6}}{{*}}{{1a) i}} & \\multirow{{3}}{{*}}{{PU}}& A & {}             & {}       \\\\\n
+            &                        & B & {}             & {}           \\\\\n
+            &                        & C & {}             & {}           \\\\\\cline{{2-5}}\n
+            & \\multirow{{3}}{{*}}{{SI ($A$)}}& A & {}             & {}           \\\\\n
+            &                        & B & {}             & {}           \\\\\n
+            &                        & C & {}             & {}           \\\\\\cline{{1-5}}\n
+            \\multirow{{6}}{{*}}{{1a) ii}} & \\multirow{{3}}{{*}}{{PU}}& A & {}             & {}                 \\\\\n
+            &                        & B & {}             & {}           \\\\\n
+            &                        & C & {}             & {}           \\\\\\cline{{2-5}}\n
+            & \\multirow{{3}}{{*}}{{SI ($A$)}}& A & {}             & {}           \\\\\n
+            &                        & B & {}             & {}           \\\\\n
+            &                        & C & {}             & {}           \\\\\\cline{{1-5}}\n
+            \\multirow{{6}}{{*}}{{1a) iii}} & \\multirow{{3}}{{*}}{{PU}}& A & {}             & {}                  \\\\\n
+            &                        & B & {}             & {}           \\\\\n
+            &                        & C & {}             & {}           \\\\\\cline{{2-5}}\n
+            & \\multirow{{3}}{{*}}{{SI ($A$)}}& A & {}             & {}           \\\\\n
+            &                        & B & {}             & {}           \\\\\n
+            &                        & C & {}             & {}           \\\\\\cline{{1-5}}\n
+            """
+                str_tabela = []
+                for row in b:
+                    for column in row:
+                        str_tabela.append("%4.4f" % column)
+
+                f.write(tabela_2.format(*str_tabela))
